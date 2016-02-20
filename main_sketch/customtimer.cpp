@@ -33,6 +33,12 @@ CustomTimer* CustomTimer::_INSTANCE = 0;
 
 CustomTimer::CustomTimer() {
 	sei();
+
+	_all_steps = 0;
+	_all_overflows = 0;
+	_timer_callbacks = 0;
+	_cycles = 0;
+	_act_cycle = 0;
 	_running = false;
 }
 
@@ -44,40 +50,57 @@ CustomTimer* CustomTimer::GetCustomTimer() {
 	return CustomTimer::_INSTANCE;
 }
 
-bool CustomTimer::prepare_countdown(float seconds, T_CALLBACK callback) {
-	if (this->_running) {
+bool CustomTimer::prepare_countdown(
+		float* seconds, int n_cycles, T_CALLBACK* callbacks) {
+	if (_running) {
 		return false;
 	} else {
-		this->_timer_callback = callback;
 
-		this->_seconds = seconds;
+		_timer_callbacks = new T_CALLBACK[n_cycles];
+		_all_steps = new unsigned int[n_cycles];
+		_all_overflows = new unsigned int[n_cycles];
+		_cycles = n_cycles;
 
-		this->_overflows = int(seconds / SECONDS_PER_OVERFLOW);
+		for (int idx = 0; idx < n_cycles; idx++) {
 
-		this->_steps = (seconds - (this->_overflows * SECONDS_PER_OVERFLOW)) / SECONDS_PER_TICK;
+			_timer_callbacks[idx] = callbacks[idx];
 
+			_all_overflows[idx] = int(seconds[idx] / SECONDS_PER_OVERFLOW);
+
+			_all_steps[idx] = (seconds[idx] - \
+				(_all_overflows[idx] * SECONDS_PER_OVERFLOW)) / SECONDS_PER_TICK;
+		}
+	
 		return true;
 	}
 }
 
 bool CustomTimer::run_countdown(void) {
-	if (this->_running) {
+	if (_running) {
 		return false;
 	} else {
-		this->_act_steps = 0;
-		this->_running = true;
+		_running = true;
+		_act_cycle = 0;
 
-		if (this->_overflows > 0) {
-			this->start_overflow_timer();
-		} else {
-			this->start_compare_timer();
-		}
+		start_timer();
 
 		return true;
 	}
 }
 
+void CustomTimer::start_timer(void) {
+	_processing_steps = _all_steps[_act_cycle];
+	_processing_overflows = _all_overflows[_act_cycle];
+
+	if (_processing_overflows > 0) {
+		start_overflow_timer();
+	} else {
+		start_compare_timer();
+	}
+}
+
 void CustomTimer::start_overflow_timer() {
+	_act_steps = 0;
 	CTCCRA = 0;
 	CTCNT = 0;
 	CTCCRB = _BV(CCS2) | _BV(CCS0);	
@@ -88,21 +111,34 @@ void CustomTimer::start_overflow_timer() {
 void CustomTimer::start_compare_timer() {
 	CTCCRA = 0;
 	CTCNT = 0;
-	COCRA = this->_steps;
+	COCRA = _processing_steps;
 	CTCCRB = _BV(CCS2) | _BV(CCS0);	
 	CTIFR = _BV(COCFA);
 	CTIMSK = _BV(COCIEA);
 }
 
-void CustomTimer::stop_and_callack(void) {
+void CustomTimer::callback_and_next(void) {
 	CTIMSK = 0;
 	CTCCRB = 0;
-	this->_running = false;
-	(*this->_timer_callback)();
+	(*_timer_callbacks[_act_cycle])();
+	if (++_act_cycle == _cycles) {
+
+		delete[] _timer_callbacks;
+		delete[] _all_steps;
+		delete[] _all_overflows;
+
+		_timer_callbacks = 0;
+		_all_steps = 0;
+		_all_overflows = 0;
+
+		_running = false;
+	} else {
+		start_timer();	
+	}
 }
 
 bool CustomTimer::check_and_inc_steps(void) {
-	return (++this->_act_steps == this->_overflows);
+	return (++_act_steps == _processing_overflows);
 }
 
 
@@ -110,7 +146,7 @@ bool CustomTimer::check_and_inc_steps(void) {
 
 ISR(C_TIMER_COMPA_vect) {
 	CustomTimer* timer = CustomTimer::GetCustomTimer();
-	timer->stop_and_callack();
+	timer->callback_and_next();
 }
 
 ISR(C_TIMER_OVF_vect) {
