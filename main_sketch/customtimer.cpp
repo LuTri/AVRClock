@@ -1,7 +1,6 @@
 #include "customtimer.h"
 #include "customtimer_config.h"
 #include <avr/interrupt.h>
-#include "Arduino.h"
 
 #define _CAT(A, B) A ## B
 #define CAT(A,B) _CAT(A,B)
@@ -70,9 +69,16 @@ bool CustomTimer::prepare_countdown(
 			_all_steps[idx] = (seconds[idx] - \
 				(_all_overflows[idx] * SECONDS_PER_OVERFLOW)) / SECONDS_PER_TICK;
 		}
-	
+
 		return true;
 	}
+}
+
+bool CustomTimer::prepare_countdown(float seconds, T_CALLBACK callback) {
+	float t_sec[1] = { seconds };
+	T_CALLBACK t_callback[1] = { callback };
+
+	prepare_countdown(t_sec, 1, t_callback);
 }
 
 bool CustomTimer::run_countdown(void) {
@@ -120,9 +126,14 @@ void CustomTimer::start_compare_timer() {
 void CustomTimer::callback_and_next(void) {
 	CTIMSK = 0;
 	CTCCRB = 0;
-	(*_timer_callbacks[_act_cycle])();
-	if (++_act_cycle == _cycles) {
 
+	T_CALLBACK callback = _timer_callbacks[_act_cycle];
+
+	if (!(++_act_cycle == _cycles)) {
+		_running = true;
+		start_timer();	
+	} else {
+		_running = false;
 		delete[] _timer_callbacks;
 		delete[] _all_steps;
 		delete[] _all_overflows;
@@ -130,11 +141,9 @@ void CustomTimer::callback_and_next(void) {
 		_timer_callbacks = 0;
 		_all_steps = 0;
 		_all_overflows = 0;
-
-		_running = false;
-	} else {
-		start_timer();	
 	}
+
+	(*callback)();
 }
 
 bool CustomTimer::check_and_inc_steps(void) {

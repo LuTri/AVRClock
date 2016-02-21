@@ -29,6 +29,7 @@ public:
 	static CustomTimer* GetCustomTimer();
 
 	bool prepare_countdown(float* seconds, int n_cycles, T_CALLBACK* callbacks);
+	bool prepare_countdown(float seconds, T_CALLBACK callback);
 	bool run_countdown(void);
 
 	bool check_and_inc_steps(void);
