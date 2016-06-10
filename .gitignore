@@ -1,2 +1,6 @@
+*.lst
+*.map
+*.o
 *.swp
 *.swo
+.dep/
