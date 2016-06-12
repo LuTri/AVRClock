@@ -1,50 +1,37 @@
 #ifndef _CUSTOMTIMER_H
 #define _CUSTOMTIMER_H
 
+#include <avr/io.h>
+
+#ifndef MAX_COUNTDOWNS
+#define MAX_COUNTDOWNS 10
+#endif
+
 typedef void (*T_CALLBACK)(void);
-typedef volatile unsigned char* REGISTER8BIT_PTR;
-typedef volatile unsigned int* REGISTER16BIT_PTR;
 
-class CustomTimer {
-private:
-	REGISTER8BIT_PTR _registers8bit[4];
-	REGISTER16BIT_PTR _registers16bit[2];
-	int _register_values[6];
+typedef struct {
+    uint16_t _all_steps[MAX_COUNTDOWNS];
+    uint16_t _all_overflows[MAX_COUNTDOWNS];
 
-	bool _running;
+    uint16_t _processing_steps;
+    uint16_t _processing_overflows;
 
-	unsigned int _act_steps;
+    uint8_t _running;
+    uint16_t _act_steps;
 
-	int _cycles;
-	int _act_cycle;
+    uint16_t _act_cycle;
+    uint16_t _cycles;
 
-	unsigned int* _all_steps;
-	unsigned int* _all_overflows;
+    T_CALLBACK _timer_callbacks[MAX_COUNTDOWNS];
+} CustomTimer;
 
-	unsigned int _processing_steps;
-	unsigned int _processing_overflows;
+uint8_t prepare_countdown(uint16_t n_cycles,
+                          float* seconds,
+                          T_CALLBACK* callbacks);
 
-	static CustomTimer* _INSTANCE_2ND;
-	static CustomTimer* _INSTANCE_1ST;
+uint8_t prepare_single_countdown(float seconds,
+                                 T_CALLBACK callback);
 
-	T_CALLBACK* _timer_callbacks;
-
-	CustomTimer(bool is_first);
-
-	void start_timer(void);
-	void fill_reg_values(bool is_first);
-public:
-	static CustomTimer* GetCustomTimer(int n_timer);
-
-	bool prepare_countdown(float* seconds, int n_cycles, T_CALLBACK* callbacks);
-	bool prepare_countdown(float seconds, T_CALLBACK callback);
-	bool run_countdown(void);
-
-	bool check_and_inc_steps(void);
-	void callback_and_next(void);
-
-	void start_overflow_timer();
-	void start_compare_timer();
-};
+uint8_t run_countdown(void);
 
 #endif
