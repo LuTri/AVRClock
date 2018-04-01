@@ -28,37 +28,38 @@
 #define MAX_SECONDS \
     (0xFFFE * SECONDS_PER_OVERFLOW) + (0xFFFE * SECONDS_PER_TICK)
 
-CustomTimer _CT_O = {._all_steps = {0},
-                     ._all_overflows = {0},
-                     ._processing_steps = 0,
-                     ._processing_overflows = 0,
+CustomTimer _CT_O = {._cd_ticks = {0},
+                     ._cd_ovfs = {0},
                      ._running = 0,
-                     ._act_steps = 0,
-                     ._act_cycle = 0,
-                     ._cycles = 0,
+                     ._cur_passed_overflows = 0,
+                     ._cur_cd = 0,
+                     ._n_cds = 0,
                      ._timer_callbacks = {0}};
 
-uint8_t prepare_countdown(uint16_t n_cycles, float* seconds,
-                          T_CALLBACK* callbacks) {
+void set_ovfs_and_ticks(float seconds, uint16_t* t_ovf, uint16_t* t_ticks) {
+    uint16_t ovfs, ticks;
+    ovfs = (uint16_t)(seconds / SECONDS_PER_OVERFLOW);
+    ticks =
+        (uint16_t)(seconds - (ovfs * SECONDS_PER_OVERFLOW)) / SECONDS_PER_TICK;
+
+    *t_ticks = ticks;
+    *t_ovf = ovfs;
+}
+
+uint8_t prepare_countdowns(uint16_t n_cds, float* seconds,
+                           T_CALLBACK* callbacks) {
     uint16_t idx;
 
-    if (_CT_O._running || n_cycles > MAX_COUNTDOWNS) {
+    if (_CT_O._running || n_cds > MAX_COUNTDOWNS) {
         return 0;
     } else {
-        _CT_O._cycles = n_cycles;
+        _CT_O._n_cds = n_cds;
 
-        for (idx = 0; idx < n_cycles; idx++) {
+        for (idx = 0; idx < n_cds; idx++) {
             _CT_O._timer_callbacks[idx] = callbacks[idx];
 
-            // Number of overflows to wait for
-            _CT_O._all_overflows[idx] =
-                (uint16_t)(seconds[idx] / SECONDS_PER_OVERFLOW);
-
-            // Number of non-overflow steps (compare) to wait for
-            _CT_O._all_steps[idx] =
-                (uint16_t)(seconds[idx] -
-                           (_CT_O._all_overflows[idx] * SECONDS_PER_OVERFLOW)) /
-                SECONDS_PER_TICK;
+            set_ovfs_and_ticks(seconds[idx], &(_CT_O._cd_ovfs[idx]),
+                               &(_CT_O._cd_ticks[idx]));
         }
 
         return 1;
@@ -76,11 +77,11 @@ uint8_t prepare_single_countdown(float seconds, T_CALLBACK callback) {
     float arr[1] = {seconds};
     T_CALLBACK c_arr[1] = {callback};
 
-    return prepare_countdown(1, arr, c_arr);
+    return prepare_countdowns(1, arr, c_arr);
 }
 
 void start_overflow_timer(void) {
-    _CT_O._act_steps = 0;
+    _CT_O._cur_passed_overflows = 0;
     TCCR1A = 0;
     TCNT1 = 0;
 
@@ -93,7 +94,7 @@ void start_compare_timer(void) {
     TCNT1 = 0;
     TCCR1A = 0;
 
-    OCR1A = _CT_O._processing_steps;
+    OCR1A = _CT_O._cd_ticks[_CT_O._cur_cd];
 
     TIMSK1 = (1 << OCIE1A);
 
@@ -101,10 +102,7 @@ void start_compare_timer(void) {
 }
 
 void start_timer(void) {
-    _CT_O._processing_steps = _CT_O._all_steps[_CT_O._act_cycle];
-    _CT_O._processing_overflows = _CT_O._all_overflows[_CT_O._act_cycle];
-
-    if (_CT_O._processing_overflows > 0) {
+    if (_CT_O._cd_ovfs[_CT_O._cur_cd] > 0) {
         start_overflow_timer();
     } else {
         start_compare_timer();
@@ -118,7 +116,7 @@ uint8_t run_countdown(void) {
         return 0;
     } else {
         _CT_O._running = 1;
-        _CT_O._act_cycle = 0;
+        _CT_O._cur_cd = 0;
 
         start_timer();
         sei();
@@ -127,11 +125,28 @@ uint8_t run_countdown(void) {
     }
 }
 
-void callback_and_next(void) {
-    T_CALLBACK callback = _CT_O._timer_callbacks[_CT_O._act_cycle];
+void reset_all_countdowns(void) {
+    uint8_t i;
+
     stop_timer();
 
-    if (!(++(_CT_O._act_cycle) == _CT_O._cycles)) {
+    _CT_O._running = 0;
+    _CT_O._cur_cd = 0;
+    _CT_O._cur_passed_overflows = 0;
+    _CT_O._n_cds = 0;
+
+    for (i = 0; i < MAX_COUNTDOWNS; i++) {
+        _CT_O._timer_callbacks[i] = NULL;
+        _CT_O._cd_ovfs[i] = 0;
+        _CT_O._cd_ticks[i] = 0;
+    }
+}
+
+void callback_and_next(void) {
+    T_CALLBACK callback = _CT_O._timer_callbacks[_CT_O._cur_cd];
+    stop_timer();
+
+    if (!(++(_CT_O._cur_cd) == _CT_O._n_cds)) {
         (*(_CT_O._timer_callbacks[0]))();
         _CT_O._running = 1;
         start_timer();
@@ -144,7 +159,7 @@ void callback_and_next(void) {
 }
 
 uint8_t check_and_inc_steps(void) {
-    return (++(_CT_O._act_steps) >= _CT_O._processing_overflows);
+    return (++(_CT_O._cur_passed_overflows) >= _CT_O._cd_ovfs[_CT_O._cur_cd]);
 }
 
 ISR(TIMER1_COMPA_vect) { callback_and_next(); }
