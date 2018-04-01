@@ -22,12 +22,16 @@
 
 #define MAX_TCNT 0xFFFF
 
+/*! @brief Seconds passing between 2 ticks, with a prescaler of 1024. */
 #define SECONDS_PER_TICK (1024.0f / F_CPU)
+/*! @brief Seconds passing between 2 overflows, with a prescaler set to 1024. */
 #define SECONDS_PER_OVERFLOW (SECONDS_PER_TICK * MAX_TCNT)
 
+/*! @brief Maximum seconds a timer can count with a prescaler set to 1024. */
 #define MAX_SECONDS \
     (0xFFFE * SECONDS_PER_OVERFLOW) + (0xFFFE * SECONDS_PER_TICK)
 
+/*! Global variable _CT_O containing countdown configuration */
 CustomTimer _CT_O = {._cd_ticks = {0},
                      ._cd_ovfs = {0},
                      ._running = 0,
@@ -36,7 +40,13 @@ CustomTimer _CT_O = {._cd_ticks = {0},
                      ._n_cds = 0,
                      ._timer_callbacks = {0}};
 
-void set_ovfs_and_ticks(float seconds, uint16_t* t_ovf, uint16_t* t_ticks) {
+/*! @brief Calculate necessary overflows and timer-ticks.
+ *
+ * Calculate the necessary overlows and timer-ticks for a desired time. */
+void set_ovfs_and_ticks(
+    float seconds /*! Desired time in seconds. */,
+    uint16_t* t_ovf /*! Variable to be set to necessary overflows */,
+    uint16_t* t_ticks /*! Variable to be set to necessary ticks*/) {
     uint16_t ovfs, ticks;
     ovfs = (uint16_t)(seconds / SECONDS_PER_OVERFLOW);
     ticks =
@@ -66,6 +76,9 @@ uint8_t prepare_countdowns(uint16_t n_cds, float* seconds,
     }
 }
 
+/*! @brief Set the prescaler of TCCR1 to 1024.
+ *
+ * This will also cause the hardware-timer to start running. */
 inline void prescale_1024(void) { TCCR1B = (1 << CS12) | (1 << CS10); }
 
 inline void stop_timer(void) {
@@ -80,27 +93,33 @@ uint8_t prepare_single_countdown(float seconds, T_CALLBACK callback) {
     return prepare_countdowns(1, arr, c_arr);
 }
 
+/*! @brief Start the timer, triggering interrupts on overflows. */
 void start_overflow_timer(void) {
     _CT_O._cur_passed_overflows = 0;
     TCCR1A = 0;
     TCNT1 = 0;
 
+    // Enable timer-overflow interrupts.
     TIMSK1 = (1 << TOIE1);
 
     prescale_1024();
 }
 
+/*! @brief Start the timer, triggering compare interrupts. */
 void start_compare_timer(void) {
     TCNT1 = 0;
     TCCR1A = 0;
 
+    // Set the ticks to run to before interrupting.
     OCR1A = _CT_O._cd_ticks[_CT_O._cur_cd];
 
+    // Enable timer-compare-interrupts.
     TIMSK1 = (1 << OCIE1A);
 
     prescale_1024();
 }
 
+/*! @brief Execute a timer, running the countdown at _CT_O._cur_cd */
 void start_timer(void) {
     if (_CT_O._cd_ovfs[_CT_O._cur_cd] > 0) {
         start_overflow_timer();
@@ -142,6 +161,17 @@ void reset_all_countdowns(void) {
     }
 }
 
+/*! @brief Execute a countdown'c callback.
+ *
+ * **Note**: since this is run inside an interrupt-routine, the callbacks must
+ * not be heavy operations.\n
+ * After executing a countdown's callback, the next countdown is started. When
+ * no next countdown is available, the timer is stopped.\n
+ * **Note**: When another countdown is supposed to follow, the timer for that
+ * next countdown is started **before** the callback is executed. This might
+ * lead to an undesired behavior, if the next countdown is finished before the
+ * current callback finished executing.
+ * */
 void callback_and_next(void) {
     T_CALLBACK callback = _CT_O._timer_callbacks[_CT_O._cur_cd];
     stop_timer();
@@ -158,6 +188,9 @@ void callback_and_next(void) {
     (*callback)();
 }
 
+/*! @brief Increment the amount of already passed overflows.
+ *
+ * @return @c **0** if not all overflows have happend yet, **1** otherwise. */
 uint8_t check_and_inc_steps(void) {
     return (++(_CT_O._cur_passed_overflows) >= _CT_O._cd_ovfs[_CT_O._cur_cd]);
 }

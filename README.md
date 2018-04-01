@@ -13,6 +13,7 @@ Currently, this project is under strong development, without any quarantee at al
 Currently, this code is solely compiled under linux, which yields the following dependencies:
  * [avr-gcc](https://gcc.gnu.org/wiki/avr-gcc) (installing this should also install the avr standard libraries for c)
  * [make](https://www.gnu.org/software/make/) (unless you want to configure and compile everything yourself)
+ * [doxygen](http://www.stack.nl/~dimitri/doxygen/) for generating the documentation
 
 ### optional
 
@@ -64,3 +65,11 @@ build: subsystems elf hex ...
 ```
 $ clang-format -i -style=file *.c *.h
 ```
+
+### Generate the documentation
+
+```
+$ doxygen
+```
+
+This command will generate a folder `documentation`, which holds both a .html and a .tex version.
