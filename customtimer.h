@@ -43,12 +43,10 @@ typedef struct {
     T_CALLBACK _timer_callbacks[MAX_COUNTDOWNS];
 } CustomTimer;
 
-uint8_t prepare_countdown(uint16_t n_cycles,
-                          float* seconds,
+uint8_t prepare_countdown(uint16_t n_cycles, float* seconds,
                           T_CALLBACK* callbacks);
 
-uint8_t prepare_single_countdown(float seconds,
-                                 T_CALLBACK callback);
+uint8_t prepare_single_countdown(float seconds, T_CALLBACK callback);
 
 uint8_t run_countdown(void);
 

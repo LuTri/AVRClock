@@ -14,6 +14,11 @@ Currently, this code is solely compiled under linux, which yields the following 
  * [avr-gcc](https://gcc.gnu.org/wiki/avr-gcc) (installing this should also install the avr standard libraries for c)
  * [make](https://www.gnu.org/software/make/) (unless you want to configure and compile everything yourself)
 
+### optional
+
+ * [clang-format](https://clang.llvm.org/docs/ClangFormat.html) for formatting the source code with the in .clang-format configured style
+
+
 ## How to
 
 ### Configuring the platform
@@ -52,4 +57,10 @@ and add this target to your main building-process:
 
 ```
 build: subsystems elf hex ...
+```
+
+### Format the code
+
+```
+$ clang-format -i -style=file *.c *.h
 ```

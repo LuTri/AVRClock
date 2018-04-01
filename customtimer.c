@@ -22,55 +22,50 @@
 
 #define MAX_TCNT 0xFFFF
 
-#define SECONDS_PER_TICK (1024.0f/F_CPU)
+#define SECONDS_PER_TICK (1024.0f / F_CPU)
 #define SECONDS_PER_OVERFLOW (SECONDS_PER_TICK * MAX_TCNT)
 
-#define MAX_SECONDS (0xFFFE * SECONDS_PER_OVERFLOW) + (0xFFFE * SECONDS_PER_TICK)
+#define MAX_SECONDS \
+    (0xFFFE * SECONDS_PER_OVERFLOW) + (0xFFFE * SECONDS_PER_TICK)
 
-CustomTimer _CT_O = {
-    ._all_steps = {0},
-    ._all_overflows = {0},
-    ._processing_steps = 0,
-    ._processing_overflows = 0,
-    ._running = 0,
-    ._act_steps = 0,
-    ._act_cycle = 0,
-    ._cycles = 0,
-    ._timer_callbacks = {0}
-};
+CustomTimer _CT_O = {._all_steps = {0},
+                     ._all_overflows = {0},
+                     ._processing_steps = 0,
+                     ._processing_overflows = 0,
+                     ._running = 0,
+                     ._act_steps = 0,
+                     ._act_cycle = 0,
+                     ._cycles = 0,
+                     ._timer_callbacks = {0}};
 
-uint8_t prepare_countdown(uint16_t n_cycles,
-                          float* seconds,
+uint8_t prepare_countdown(uint16_t n_cycles, float* seconds,
                           T_CALLBACK* callbacks) {
     uint16_t idx;
 
     if (_CT_O._running || n_cycles > MAX_COUNTDOWNS) {
         return 0;
     } else {
-
         _CT_O._cycles = n_cycles;
 
         for (idx = 0; idx < n_cycles; idx++) {
-
             _CT_O._timer_callbacks[idx] = callbacks[idx];
 
             // Number of overflows to wait for
-            _CT_O._all_overflows[idx] =\
+            _CT_O._all_overflows[idx] =
                 (uint16_t)(seconds[idx] / SECONDS_PER_OVERFLOW);
 
             // Number of non-overflow steps (compare) to wait for
-            _CT_O._all_steps[idx] = (uint16_t)(seconds[idx] - \
-                (_CT_O._all_overflows[idx] * SECONDS_PER_OVERFLOW))\
-                / SECONDS_PER_TICK;
+            _CT_O._all_steps[idx] =
+                (uint16_t)(seconds[idx] -
+                           (_CT_O._all_overflows[idx] * SECONDS_PER_OVERFLOW)) /
+                SECONDS_PER_TICK;
         }
 
         return 1;
     }
 }
 
-inline void prescale_1024(void) {
-    TCCR1B = (1 << CS12) | (1 << CS10);
-}
+inline void prescale_1024(void) { TCCR1B = (1 << CS12) | (1 << CS10); }
 
 inline void stop_timer(void) {
     TIMSK1 = 0;
@@ -139,7 +134,7 @@ void callback_and_next(void) {
     if (!(++(_CT_O._act_cycle) == _CT_O._cycles)) {
         (*(_CT_O._timer_callbacks[0]))();
         _CT_O._running = 1;
-        start_timer();    
+        start_timer();
     } else {
         (*(_CT_O._timer_callbacks[0]))();
         _CT_O._running = 0;
@@ -152,14 +147,10 @@ uint8_t check_and_inc_steps(void) {
     return (++(_CT_O._act_steps) >= _CT_O._processing_overflows);
 }
 
-ISR(TIMER1_COMPA_vect) {
-    callback_and_next();
-}
+ISR(TIMER1_COMPA_vect) { callback_and_next(); }
 
 ISR(TIMER1_OVF_vect) {
     if (check_and_inc_steps()) {
         start_compare_timer();
     }
 }
-
-
