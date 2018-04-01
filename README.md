@@ -37,6 +37,17 @@ $ make
 
 After successfully compiling the source, a `customtimer.o`-file is created.
 
+### Running unit tests
+
+This project has some basic unit tests provided. Those tests are executed by
+compiling the source to a native C-object and mocking some of the ATmegaX internals.
+
+Execute the tests by running
+
+```
+$ make test
+```
+
 ### Compiling this project as a submodule, from the parent-repository's Makefile
 
 `make` makes it fairly straightforward to include and compile projects, which are included as e.g. git submodules.

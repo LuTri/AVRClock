@@ -17,19 +17,13 @@
  */
 
 #include "customtimer.h"
+#ifndef TESTING
 #include <avr/interrupt.h>
+#else
+#define inline
+#include "test.h"
+#endif
 #include <stdlib.h>
-
-#define MAX_TCNT 0xFFFF
-
-/*! @brief Seconds passing between 2 ticks, with a prescaler of 1024. */
-#define SECONDS_PER_TICK (1024.0f / F_CPU)
-/*! @brief Seconds passing between 2 overflows, with a prescaler set to 1024. */
-#define SECONDS_PER_OVERFLOW (SECONDS_PER_TICK * MAX_TCNT)
-
-/*! @brief Maximum seconds a timer can count with a prescaler set to 1024. */
-#define MAX_SECONDS \
-    (0xFFFE * SECONDS_PER_OVERFLOW) + (0xFFFE * SECONDS_PER_TICK)
 
 /*! Global variable _CT_O containing countdown configuration */
 CustomTimer _CT_O = {._cd_ticks = {0},

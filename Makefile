@@ -66,6 +66,9 @@ CFLAGS += -DF_OSC=$(F_OSC)
 CFLAGS += -DF_CPU=$(F_OSC)
 CFLAGS += -DMAX_COUNTDOWNS=10
 
+TFLAGS = -Wall
+TFLAGS += -DTESTING
+
 # Define programs and commands.
 CC = avr-gcc
 SIZE = avr-size
@@ -94,7 +97,7 @@ GENDEPFLAGS = -MD -MP -MF .dep/$(@F).d
 ALL_CFLAGS = -mmcu=$(MCU) -I. $(CFLAGS) $(GENDEPFLAGS)
 
 # Default target.
-all: begin gccversion build size finished end
+all: begin clean gccversion build size finished end
 
 build: object
 
@@ -102,6 +105,8 @@ size:
 	$(SIZE) $(TARGET).o
 
 object: $(TARGET).o
+
+tobject: customtimer.o test.o
 
 begin:
 	@echo
@@ -124,14 +129,28 @@ gccversion :
 	@echo $(MSG_COMPILING) $<
 	$(CC) -c $(ALL_CFLAGS) $< -o $@
 
+link:
+	$(CC) $(ALL_CFLAGS) $(OBJ) -o $(TARGET)
+
 # Target: clean project.
 clean: begin clean_list finished end
+
+run_test:
+	./test
+
+# Target: run tests
+test: TARGET=test
+test: SRC=$(TARGET).c customtimer.c
+test: CC=gcc
+test: ALL_CFLAGS=$(TFLAGS)
+test: begin clean gccversion tobject link run_test end
 
 clean_list :
 	@echo
 	@echo $(MSG_CLEANING)
 	$(REMOVE) $(OBJ)
 	$(REMOVE) $(SRC:.c=.s)
+	$(REMOVE) $(SRC:.c=.lst)
 	$(REMOVE) $(SRC:.c=.d)
 	$(REMOVE) .dep/*
 
@@ -142,5 +161,5 @@ clean_list :
 
 
 # Listing of phony targets.
-.PHONY : all begin finish end size gccversion build clean clean_list 
-
+.PHONY : all test begin finish end size gccversion build clean clean_list \
+   run_test
