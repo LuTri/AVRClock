@@ -1,4 +1,4 @@
-# AVRClock
+# AVRClock [![Build Status](https://travis-ci.org/LuTri/AVRClock.svg?branch=master)](https://travis-ci.org/LuTri/AVRClock)
 
 This project aims to provide a simple, yet comfortable API, for those trying to implement any time(r)-based applications on the Atmel ATmegaX microcontrollers.
 
