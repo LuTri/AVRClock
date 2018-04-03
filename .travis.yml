@@ -1,0 +1,12 @@
+language: c
+addons:
+    apt:
+        packages:
+            - gcc-avr
+            - avr-libc
+            - doxygen
+install: true
+before_script:
+    make test
+script:
+    make

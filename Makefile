@@ -67,6 +67,7 @@ CFLAGS += -DF_CPU=$(F_OSC)
 CFLAGS += -DMAX_COUNTDOWNS=10
 
 TFLAGS = -Wall
+TFLAGS += -std=c99
 TFLAGS += -DTESTING
 
 # Define programs and commands.
