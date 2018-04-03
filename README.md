@@ -4,6 +4,10 @@ This project aims to provide a simple, yet comfortable API, for those trying to 
 
 This project was implemented using the GPLv3.
 
+## Documentation
+
+The documentation for the APIs is available [here](http://lutri.github.io/AVRClock/).
+
 ## Contribution / Warranty
 
 Currently, this project is under strong development, without any quarantee at all - feel free to contribute any knowledge / ideas / bugfixes you want to.
@@ -83,4 +87,5 @@ $ clang-format -i -style=file *.c *.h
 $ doxygen
 ```
 
-This command will generate a folder `documentation`, which holds both a .html and a .tex version.
+This command will generate a folder `docs`, which holds both a .html and a .tex version.
+(The html version is also published to [github pages](http://lutri.github.io/AVRClock/), always build from the latest master branch.)
