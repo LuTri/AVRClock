@@ -1,0 +1,56 @@
+\hypertarget{structCustomTimer}{\section{Custom\-Timer Struct Reference}
+\label{structCustomTimer}\index{Custom\-Timer@{Custom\-Timer}}
+}
+
+
+{\ttfamily \#include $<$customtimer.\-h$>$}
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{test_8h_aa93ac051f2256663466253286bfef785}{uint16\-\_\-t} \hyperlink{structCustomTimer_ae0684ad120aeca74d5b9346e214e8320}{\-\_\-cd\-\_\-ticks} \mbox{[}\hyperlink{customtimer_8h_aa856fcb7aee41aa2cdd570d9472fa2a5}{M\-A\-X\-\_\-\-C\-O\-U\-N\-T\-D\-O\-W\-N\-S}\mbox{]}
+\item 
+\hyperlink{test_8h_aa93ac051f2256663466253286bfef785}{uint16\-\_\-t} \hyperlink{structCustomTimer_aaedf2c0761d3a5c5f0fc620b8ff3066b}{\-\_\-cd\-\_\-ovfs} \mbox{[}\hyperlink{customtimer_8h_aa856fcb7aee41aa2cdd570d9472fa2a5}{M\-A\-X\-\_\-\-C\-O\-U\-N\-T\-D\-O\-W\-N\-S}\mbox{]}
+\item 
+\hyperlink{test_8h_aba7bc1797add20fe3efdf37ced1182c5}{uint8\-\_\-t} \hyperlink{structCustomTimer_a8812f98379da20ef638a8f4e3e2986e8}{\-\_\-running}
+\item 
+\hyperlink{test_8h_aa93ac051f2256663466253286bfef785}{uint16\-\_\-t} \hyperlink{structCustomTimer_ad15fa895447acab30d432060384580da}{\-\_\-cur\-\_\-passed\-\_\-overflows}
+\item 
+\hyperlink{test_8h_aa93ac051f2256663466253286bfef785}{uint16\-\_\-t} \hyperlink{structCustomTimer_a09300946b38b86d97fb0b156ef2cc4b2}{\-\_\-cur\-\_\-cd}
+\item 
+\hyperlink{test_8h_aa93ac051f2256663466253286bfef785}{uint16\-\_\-t} \hyperlink{structCustomTimer_a62c65f1d0a0d390f50345ecd0f9a7271}{\-\_\-n\-\_\-cds}
+\item 
+\hyperlink{customtimer_8h_ad3a17d16a861e5cdc4f4af2ed19fa407}{T\-\_\-\-C\-A\-L\-L\-B\-A\-C\-K} \hyperlink{structCustomTimer_a50e4108790b76dc45bdc008ee86dd94c}{\-\_\-timer\-\_\-callbacks} \mbox{[}\hyperlink{customtimer_8h_aa856fcb7aee41aa2cdd570d9472fa2a5}{M\-A\-X\-\_\-\-C\-O\-U\-N\-T\-D\-O\-W\-N\-S}\mbox{]}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Structure holding all necessary information for the custom countdowns. The maximum number of available countdowns is defined by \hyperlink{customtimer_8h_aa856fcb7aee41aa2cdd570d9472fa2a5}{M\-A\-X\-\_\-\-C\-O\-U\-N\-T\-D\-O\-W\-N\-S}, which defaults to 10. 
+
+\subsection{Member Data Documentation}
+\hypertarget{structCustomTimer_aaedf2c0761d3a5c5f0fc620b8ff3066b}{\index{Custom\-Timer@{Custom\-Timer}!\-\_\-cd\-\_\-ovfs@{\-\_\-cd\-\_\-ovfs}}
+\index{\-\_\-cd\-\_\-ovfs@{\-\_\-cd\-\_\-ovfs}!CustomTimer@{Custom\-Timer}}
+\subsubsection[{\-\_\-cd\-\_\-ovfs}]{\setlength{\rightskip}{0pt plus 5cm}{\bf uint16\-\_\-t} Custom\-Timer\-::\-\_\-cd\-\_\-ovfs\mbox{[}{\bf M\-A\-X\-\_\-\-C\-O\-U\-N\-T\-D\-O\-W\-N\-S}\mbox{]}}}\label{structCustomTimer_aaedf2c0761d3a5c5f0fc620b8ff3066b}
+Overflows to pass for countdown \#\-I\-D\-X. \hypertarget{structCustomTimer_ae0684ad120aeca74d5b9346e214e8320}{\index{Custom\-Timer@{Custom\-Timer}!\-\_\-cd\-\_\-ticks@{\-\_\-cd\-\_\-ticks}}
+\index{\-\_\-cd\-\_\-ticks@{\-\_\-cd\-\_\-ticks}!CustomTimer@{Custom\-Timer}}
+\subsubsection[{\-\_\-cd\-\_\-ticks}]{\setlength{\rightskip}{0pt plus 5cm}{\bf uint16\-\_\-t} Custom\-Timer\-::\-\_\-cd\-\_\-ticks\mbox{[}{\bf M\-A\-X\-\_\-\-C\-O\-U\-N\-T\-D\-O\-W\-N\-S}\mbox{]}}}\label{structCustomTimer_ae0684ad120aeca74d5b9346e214e8320}
+Number of ticks until compare interrupt for countdown \#\-I\-D\-X is triggered. \hypertarget{structCustomTimer_a09300946b38b86d97fb0b156ef2cc4b2}{\index{Custom\-Timer@{Custom\-Timer}!\-\_\-cur\-\_\-cd@{\-\_\-cur\-\_\-cd}}
+\index{\-\_\-cur\-\_\-cd@{\-\_\-cur\-\_\-cd}!CustomTimer@{Custom\-Timer}}
+\subsubsection[{\-\_\-cur\-\_\-cd}]{\setlength{\rightskip}{0pt plus 5cm}{\bf uint16\-\_\-t} Custom\-Timer\-::\-\_\-cur\-\_\-cd}}\label{structCustomTimer_a09300946b38b86d97fb0b156ef2cc4b2}
+I\-D\-X of currently running countdown. \hypertarget{structCustomTimer_ad15fa895447acab30d432060384580da}{\index{Custom\-Timer@{Custom\-Timer}!\-\_\-cur\-\_\-passed\-\_\-overflows@{\-\_\-cur\-\_\-passed\-\_\-overflows}}
+\index{\-\_\-cur\-\_\-passed\-\_\-overflows@{\-\_\-cur\-\_\-passed\-\_\-overflows}!CustomTimer@{Custom\-Timer}}
+\subsubsection[{\-\_\-cur\-\_\-passed\-\_\-overflows}]{\setlength{\rightskip}{0pt plus 5cm}{\bf uint16\-\_\-t} Custom\-Timer\-::\-\_\-cur\-\_\-passed\-\_\-overflows}}\label{structCustomTimer_ad15fa895447acab30d432060384580da}
+Number of overflows passed so far, for currently running countdown \hypertarget{structCustomTimer_a62c65f1d0a0d390f50345ecd0f9a7271}{\index{Custom\-Timer@{Custom\-Timer}!\-\_\-n\-\_\-cds@{\-\_\-n\-\_\-cds}}
+\index{\-\_\-n\-\_\-cds@{\-\_\-n\-\_\-cds}!CustomTimer@{Custom\-Timer}}
+\subsubsection[{\-\_\-n\-\_\-cds}]{\setlength{\rightskip}{0pt plus 5cm}{\bf uint16\-\_\-t} Custom\-Timer\-::\-\_\-n\-\_\-cds}}\label{structCustomTimer_a62c65f1d0a0d390f50345ecd0f9a7271}
+Number of configured countdowns. \hypertarget{structCustomTimer_a8812f98379da20ef638a8f4e3e2986e8}{\index{Custom\-Timer@{Custom\-Timer}!\-\_\-running@{\-\_\-running}}
+\index{\-\_\-running@{\-\_\-running}!CustomTimer@{Custom\-Timer}}
+\subsubsection[{\-\_\-running}]{\setlength{\rightskip}{0pt plus 5cm}{\bf uint8\-\_\-t} Custom\-Timer\-::\-\_\-running}}\label{structCustomTimer_a8812f98379da20ef638a8f4e3e2986e8}
+State-\/flag, whether the countdown timer is currently running. \hypertarget{structCustomTimer_a50e4108790b76dc45bdc008ee86dd94c}{\index{Custom\-Timer@{Custom\-Timer}!\-\_\-timer\-\_\-callbacks@{\-\_\-timer\-\_\-callbacks}}
+\index{\-\_\-timer\-\_\-callbacks@{\-\_\-timer\-\_\-callbacks}!CustomTimer@{Custom\-Timer}}
+\subsubsection[{\-\_\-timer\-\_\-callbacks}]{\setlength{\rightskip}{0pt plus 5cm}{\bf T\-\_\-\-C\-A\-L\-L\-B\-A\-C\-K} Custom\-Timer\-::\-\_\-timer\-\_\-callbacks\mbox{[}{\bf M\-A\-X\-\_\-\-C\-O\-U\-N\-T\-D\-O\-W\-N\-S}\mbox{]}}}\label{structCustomTimer_a50e4108790b76dc45bdc008ee86dd94c}
+Array containing the desired callbacks for each countdown. 
+
+The documentation for this struct was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{customtimer_8h}{customtimer.\-h}\end{DoxyCompactItemize}
