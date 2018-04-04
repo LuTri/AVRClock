@@ -27,8 +27,6 @@ typedef unsigned char uint8_t;
 #define TOIE1 0b10
 #define OCIE1A 0b1
 
-#define ISR(vector) void vector(void)
-
 extern uint16_t TCCR1A;
 extern uint16_t TCCR1B;
 extern uint16_t TIMSK1;

@@ -193,9 +193,19 @@ uint8_t check_and_inc_steps(void) {
     return (++(_CT_O._cur_passed_overflows) >= _CT_O._cd_ovfs[_CT_O._cur_cd]);
 }
 
-ISR(TIMER1_COMPA_vect) { callback_and_next(); }
+#ifndef TESTING
+ISR(TIMER1_COMPA_vect)
+#else
+void TIMER1_COMPA_vect (void)
+#endif
+    { callback_and_next(); }
 
-ISR(TIMER1_OVF_vect) {
+#ifndef TESTING
+ISR(TIMER1_OVF_vect)
+#else
+void TIMER1_OVF_vect (void)
+#endif
+{
     if (check_and_inc_steps()) {
         start_compare_timer();
     }

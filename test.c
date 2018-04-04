@@ -38,9 +38,15 @@ char compare_dec(int yielded, int expected, const char* hint);
 /* mock AVR interrupt enabling */
 void sei(){};
 
+/*
+ * Test functions
+ */
+
+/* preparation testing */
+
 char test_countdown_preparation(void) {
     char buf[1000];
-    int result = 0;
+    char result = 0;
 
     float seconds[] = {1.3, 7.1, MAX_SECONDS - 1, 0};
     float fail_zeros[11] = {0};
@@ -79,9 +85,75 @@ char test_countdown_preparation(void) {
     return result;
 }
 
+/* callback testing */
+
+int value = 0;
+void set_value_to_1(void) { value = 1; }
+void set_value_to_2(void) { value = 2; }
+
+char test_countdown_callback(void) {
+    char result = 0;
+
+    float secs[] = {0, 0};
+    T_CALLBACK callbacks[] = {set_value_to_1, set_value_to_2};
+
+    print_test_beauty(__FUNCTION__);
+
+    prepare_countdowns(2, secs, callbacks);
+    run_countdown();
+    result |= compare_dec(value, 0, "PRE Callback execution");
+    TIMER1_COMPA_vect();
+    result |= compare_dec(value, 1, "Callback execution 1");
+    TIMER1_COMPA_vect();
+    result |= compare_dec(value, 2, "Callback execution 2");
+
+    if (result != 0) {
+        failure_message(__FUNCTION__);
+    } else {
+        success_message(__FUNCTION__);
+    }
+    return result;
+}
+
+/* reset testing */
+
+char test_reset_countdowns(void) {
+    char result = 0;
+
+    float secs[] = {0, 0};
+    T_CALLBACK callbacks[] = {set_value_to_1, set_value_to_2};
+
+    reset_all_countdowns();
+    print_test_beauty(__FUNCTION__);
+
+    value = 0;
+    prepare_countdowns(2, secs, callbacks);
+    run_countdown();
+    result |= compare_dec(value, 0, "PRE Callback execution");
+    TIMER1_COMPA_vect();
+    result |= compare_dec(value, 1, "Callback execution 1");
+    reset_all_countdowns();
+    TIMER1_COMPA_vect();
+    result |= compare_dec(value, 1, "Callback execution 2");
+
+    if (result != 0) {
+        failure_message(__FUNCTION__);
+    } else {
+        success_message(__FUNCTION__);
+    }
+    return result;
+}
+
+/*
+ * !Test functions
+ */
+
 /* Generate the list of testfunction, add function-names here */
 TEST_FUNC* collect_tests(void) {
-    static TEST_FUNC funcs[] = {test_countdown_preparation, NULL};
+    static TEST_FUNC funcs[] = {
+        test_countdown_preparation, test_countdown_callback,
+        test_reset_countdowns, NULL /* Array end */
+    };
     return funcs;
 }
 

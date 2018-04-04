@@ -23,6 +23,8 @@
 #include <avr/io.h>
 #else
 #include "test.h"
+void TIMER1_COMPA_vect (void);
+void TIMER1_OVF_vect (void);
 #endif
 
 #ifndef MAX_COUNTDOWNS
