@@ -23,8 +23,8 @@
 #include <avr/io.h>
 #else
 #include "test.h"
-void TIMER1_COMPA_vect (void);
-void TIMER1_OVF_vect (void);
+void TIMER1_COMPA_vect(void);
+void TIMER1_OVF_vect(void);
 #endif
 
 #ifndef MAX_COUNTDOWNS
@@ -68,9 +68,13 @@ typedef struct {
     uint16_t _cur_cd;
     /*! Number of configured countdowns. */
     uint16_t _n_cds;
+    /*! Flags whether, a callback of countdown[x] should be run inside the ISR*/
+    uint8_t _cb_in_interrupt[MAX_COUNTDOWNS];
 
     /*! Array containing the desired callbacks for each countdown. */
     T_CALLBACK _timer_callbacks[MAX_COUNTDOWNS];
+    /*! Latest available non-ISR callback */
+    T_CALLBACK ready_callback;
 } CustomTimer;
 
 /*! @brief Prepare a number of countdowns.
@@ -85,7 +89,12 @@ uint8_t prepare_countdowns(
                   countdown */,
     T_CALLBACK*
         callbacks /*! Array of length <n_cds>, containing pointers to the
-                    callbacks for each countdown */);
+                    callbacks for each countdown */,
+    uint8_t*
+        cb_in_interrupt /*! Array of length <n_cds>, describing whether or
+                         not the callback should be run inside the
+                         interrupt routine. when NULL is given, all callbacks
+                         ar run inside the interrupt routine. */);
 
 /*! @brief Prepare a single countdown.
  *
@@ -94,7 +103,10 @@ uint8_t prepare_countdowns(
  * @return @c **1** on success, **0** on failure. */
 uint8_t prepare_single_countdown(
     float seconds /*! desired length of the countdown */,
-    T_CALLBACK callback /*! Callback for the countdown */);
+    T_CALLBACK callback /*! Callback for the countdown */,
+    uint8_t
+        cb_in_interrupt /*! flag, whether the callback should be run inside
+                             the interrupt routine */);
 
 /*! @brief Execute all configured countdowns.
  *
@@ -104,6 +116,13 @@ uint8_t run_countdown(void);
 
 /*! @brief Stop and reset all configured countdowns.*/
 void reset_all_countdowns(void);
+
+/*! @brief Get latest callback
+ *
+ * When a callback, which is not supposed to be run inside the ISR is ready,
+ * return it's pointer and set the latest callback in \ref CustomTimer to NULL.
+ * @return @c \ref T_CALLBACK of the latest callback or NULL */
+T_CALLBACK get_current_callback(void);
 
 #ifdef TESTING
 extern CustomTimer _CT_O;

@@ -32,7 +32,9 @@ CustomTimer _CT_O = {._cd_ticks = {0},
                      ._cur_passed_overflows = 0,
                      ._cur_cd = 0,
                      ._n_cds = 0,
-                     ._timer_callbacks = {0}};
+                     ._timer_callbacks = {0},
+                     ._cb_in_interrupt = {0},
+                     .ready_callback = NULL};
 
 /*! @brief Calculate necessary overflows and timer-ticks.
  *
@@ -51,7 +53,7 @@ void set_ovfs_and_ticks(
 }
 
 uint8_t prepare_countdowns(uint16_t n_cds, float* seconds,
-                           T_CALLBACK* callbacks) {
+                           T_CALLBACK* callbacks, uint8_t* cb_in_interrupt) {
     uint16_t idx;
 
     if (_CT_O._running || n_cds > MAX_COUNTDOWNS) {
@@ -64,6 +66,11 @@ uint8_t prepare_countdowns(uint16_t n_cds, float* seconds,
 
             set_ovfs_and_ticks(seconds[idx], &(_CT_O._cd_ovfs[idx]),
                                &(_CT_O._cd_ticks[idx]));
+            if (cb_in_interrupt == NULL) {
+                _CT_O._cb_in_interrupt[idx] = 1;
+            } else {
+                _CT_O._cb_in_interrupt[idx] = cb_in_interrupt[idx];
+            }
         }
 
         return 1;
@@ -80,11 +87,13 @@ inline void stop_timer(void) {
     TCCR1B = 0;
 }
 
-uint8_t prepare_single_countdown(float seconds, T_CALLBACK callback) {
+uint8_t prepare_single_countdown(float seconds, T_CALLBACK callback,
+                                 uint8_t cb_in_interrupt) {
+    uint8_t cb_in_isr[1] = {cb_in_interrupt};
     float arr[1] = {seconds};
     T_CALLBACK c_arr[1] = {callback};
 
-    return prepare_countdowns(1, arr, c_arr);
+    return prepare_countdowns(1, arr, c_arr, cb_in_isr);
 }
 
 /*! @brief Start the timer, triggering interrupts on overflows. */
@@ -147,6 +156,7 @@ void reset_all_countdowns(void) {
     _CT_O._cur_cd = 0;
     _CT_O._cur_passed_overflows = 0;
     _CT_O._n_cds = 0;
+    _CT_O.ready_callback = NULL;
 
     for (i = 0; i < MAX_COUNTDOWNS; i++) {
         _CT_O._timer_callbacks[i] = NULL;
@@ -155,35 +165,45 @@ void reset_all_countdowns(void) {
     }
 }
 
-/*! @brief Execute a countdown'c callback.
+/*! @brief Execute a countdown's callback.
  *
- * **Note**: since this is run inside an interrupt-routine, the callbacks must
- * not be heavy operations.\n
- * After executing a countdown's callback, the next countdown is started. When
- * no next countdown is available, the timer is stopped.\n
- * **Note**: When another countdown is supposed to follow, the timer for that
- * next countdown is started **before** the callback is executed. This might
- * lead to an undesired behavior, if the next countdown is finished before the
- * current callback finished executing.
+ * **Note**: Callbacks may be run inside the ISR. When a callback is a heavy,
+ * but not critical function, consider running it outside ISR (see
+ * \ref prepare_countdowns ). When a next countdown is avaiable run it,
+ * otherwise stop the countdown completely.
  * */
 void callback_and_next(void) {
-    T_CALLBACK callback = _CT_O._timer_callbacks[_CT_O._cur_cd];
+    uint8_t cur_cd = _CT_O._cur_cd;
+    T_CALLBACK callback = _CT_O._timer_callbacks[cur_cd];
+
     stop_timer();
 
-    if (! _CT_O._running) {
+    if (!_CT_O._running) {
         return;
     }
 
+    /* Execute callback in ISR or set ready_callback */
+    if (!(_CT_O._cb_in_interrupt[cur_cd])) {
+        _CT_O.ready_callback = callback;
+    } else {
+        (*callback)();
+    }
+
+    /* continue with following countdowns */
     if (!(++(_CT_O._cur_cd) == _CT_O._n_cds)) {
-        (*(_CT_O._timer_callbacks[0]))();
         _CT_O._running = 1;
         start_timer();
     } else {
-        (*(_CT_O._timer_callbacks[0]))();
         _CT_O._running = 0;
     }
+}
 
-    (*callback)();
+T_CALLBACK get_current_callback(void) {
+    T_CALLBACK cb;
+    cb = _CT_O.ready_callback;
+    _CT_O.ready_callback = NULL;
+
+    return cb;
 }
 
 /*! @brief Increment the amount of already passed overflows.
@@ -196,14 +216,16 @@ uint8_t check_and_inc_steps(void) {
 #ifndef TESTING
 ISR(TIMER1_COMPA_vect)
 #else
-void TIMER1_COMPA_vect (void)
+void TIMER1_COMPA_vect(void)
 #endif
-    { callback_and_next(); }
+{
+    callback_and_next();
+}
 
 #ifndef TESTING
 ISR(TIMER1_OVF_vect)
 #else
-void TIMER1_OVF_vect (void)
+void TIMER1_OVF_vect(void)
 #endif
 {
     if (check_and_inc_steps()) {

@@ -34,6 +34,7 @@ void success_message(const char* name);
 void failure_message(const char* name);
 
 char compare_dec(int yielded, int expected, const char* hint);
+char compare_cb(T_CALLBACK yielded, T_CALLBACK expected, const char* hint);
 
 /* mock AVR interrupt enabling */
 void sei(){};
@@ -58,13 +59,13 @@ char test_countdown_preparation(void) {
 
     print_test_beauty(__FUNCTION__);
 
-    if ((prepare_countdowns(11, fail_zeros, cb_zeros))) {
+    if ((prepare_countdowns(11, fail_zeros, cb_zeros, NULL))) {
         printf("Countdown preparation did not abort on too many countdowns!\n");
         failure_message(__FUNCTION__);
         return 1;
     }
 
-    if (!(prepare_countdowns(4, seconds, cb))) {
+    if (!(prepare_countdowns(4, seconds, cb, NULL))) {
         printf("Setting the countdowns failed!\n");
         failure_message(__FUNCTION__);
         return 1;
@@ -85,11 +86,13 @@ char test_countdown_preparation(void) {
     return result;
 }
 
-/* callback testing */
-
+/* Mocked callbacks */
 int value = 0;
 void set_value_to_1(void) { value = 1; }
 void set_value_to_2(void) { value = 2; }
+void set_value_to_3(void) { value = 3; }
+
+/* callback testing */
 
 char test_countdown_callback(void) {
     char result = 0;
@@ -99,7 +102,11 @@ char test_countdown_callback(void) {
 
     print_test_beauty(__FUNCTION__);
 
-    prepare_countdowns(2, secs, callbacks);
+    if (!(prepare_countdowns(2, secs, callbacks, NULL))) {
+        printf("Setting the countdowns failed!\n");
+        failure_message(__FUNCTION__);
+        return 1;
+    }
     run_countdown();
     result |= compare_dec(value, 0, "PRE Callback execution");
     TIMER1_COMPA_vect();
@@ -127,7 +134,11 @@ char test_reset_countdowns(void) {
     print_test_beauty(__FUNCTION__);
 
     value = 0;
-    prepare_countdowns(2, secs, callbacks);
+    if (!(prepare_countdowns(2, secs, callbacks, NULL))) {
+        printf("Setting the countdowns failed!\n");
+        failure_message(__FUNCTION__);
+        return 1;
+    }
     run_countdown();
     result |= compare_dec(value, 0, "PRE Callback execution");
     TIMER1_COMPA_vect();
@@ -135,6 +146,53 @@ char test_reset_countdowns(void) {
     reset_all_countdowns();
     TIMER1_COMPA_vect();
     result |= compare_dec(value, 1, "Callback execution 2");
+
+    if (result != 0) {
+        failure_message(__FUNCTION__);
+    } else {
+        success_message(__FUNCTION__);
+    }
+    return result;
+}
+
+/* test non-ISR callbacks */
+
+char test_non_isr_callback_combination(void) {
+    char result = 0;
+    T_CALLBACK cur_cb;
+
+    float secs[] = {0, 0, 0};
+    T_CALLBACK callbacks[] = {set_value_to_1, set_value_to_2, set_value_to_3};
+    uint8_t in_isr[] = {1, 0, 1};
+
+    reset_all_countdowns();
+    print_test_beauty(__FUNCTION__);
+
+    value = 0;
+    if (!(prepare_countdowns(3, secs, callbacks, in_isr))) {
+        printf("Setting the countdowns failed!\n");
+        failure_message(__FUNCTION__);
+        return 1;
+    }
+
+    run_countdown();
+
+    result |= compare_dec(value, 0, "PRE Callback execution");
+    TIMER1_COMPA_vect();
+    compare_cb(get_current_callback(), NULL, "Available callback 1");
+    result |= compare_dec(value, 1, "Callback execution 1");
+
+    TIMER1_COMPA_vect();
+    result |= compare_dec(value, 1, "Callback execution 2");
+
+    cur_cb = get_current_callback();
+    result |= compare_cb(cur_cb, set_value_to_2, "Available callback 2");
+    (*cur_cb)();
+    result |= compare_dec(value, 2, "NON-ISR Callback execution 2");
+
+    TIMER1_COMPA_vect();
+    compare_cb(get_current_callback(), NULL, "Available callback 3");
+    result |= compare_dec(value, 3, "Callback execution 3");
 
     if (result != 0) {
         failure_message(__FUNCTION__);
@@ -152,7 +210,8 @@ char test_reset_countdowns(void) {
 TEST_FUNC* collect_tests(void) {
     static TEST_FUNC funcs[] = {
         test_countdown_preparation, test_countdown_callback,
-        test_reset_countdowns, NULL /* Array end */
+        test_reset_countdowns, test_non_isr_callback_combination,
+        NULL /* Array end */
     };
     return funcs;
 }
@@ -180,22 +239,24 @@ char compare_dec(int yielded, int expected, const char* hint) {
     return 0;
 }
 
+char compare_cb(T_CALLBACK yielded, T_CALLBACK expected, const char* hint) {
+    if (yielded != expected) {
+        printf("Failed! Expected %p, got %p. Hint: \"%s\"\n", expected, yielded,
+               hint);
+        return 1;
+    }
+    return 0;
+}
+
 /* returns the number of failed tests */
 int main(void) {
     int idx = 0;
-    float seconds = MAX_SECONDS;
     char success = 0;
+
     TEST_FUNC* funcs;
     TEST_FUNC func;
 
     funcs = collect_tests();
-
-    while (_CT_O._cd_ovfs[0] == 0) {
-        seconds -= ++idx;
-        prepare_single_countdown(seconds, sei);
-    }
-
-    idx = 0;
 
     while ((func = funcs[idx++]) != NULL) {
         success += (*func)();
