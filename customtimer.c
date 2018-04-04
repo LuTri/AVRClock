@@ -170,6 +170,10 @@ void callback_and_next(void) {
     T_CALLBACK callback = _CT_O._timer_callbacks[_CT_O._cur_cd];
     stop_timer();
 
+    if (! _CT_O._running) {
+        return;
+    }
+
     if (!(++(_CT_O._cur_cd) == _CT_O._n_cds)) {
         (*(_CT_O._timer_callbacks[0]))();
         _CT_O._running = 1;
