@@ -1,4 +1,7 @@
 var searchData=
 [
-  ['isr',['ISR',['../test_8h.html#aae8ea90ab1d3064dfeb128c126d4709d',1,'ISR():&#160;test.h'],['../customtimer_8c.html#ad39420cdd896dd12c68e36313139d0a5',1,'ISR(TIMER1_COMPA_vect):&#160;customtimer.c'],['../customtimer_8c.html#ab16889ae984b9b798989a0d239283cac',1,'ISR(TIMER1_OVF_vect):&#160;customtimer.c']]]
+  ['main',['main',['../test_8c.html#a840291bc02cba5474a4cb46a9b9566fe',1,'test.c']]],
+  ['max_5fcountdowns',['MAX_COUNTDOWNS',['../customtimer_8h.html#aa856fcb7aee41aa2cdd570d9472fa2a5',1,'customtimer.h']]],
+  ['max_5fseconds',['MAX_SECONDS',['../customtimer_8h.html#ad573bc67e6c14677a06d1737f3d72975',1,'customtimer.h']]],
+  ['max_5ftcnt',['MAX_TCNT',['../customtimer_8h.html#a19fda32821a04f7f14f29aac70641260',1,'customtimer.h']]]
 ];

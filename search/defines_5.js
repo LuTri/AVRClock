@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['seconds_5fper_5foverflow',['SECONDS_PER_OVERFLOW',['../customtimer_8h.html#a3af3f37e52689dd5043feca09823ab69',1,'customtimer.h']]],
-  ['seconds_5fper_5ftick',['SECONDS_PER_TICK',['../customtimer_8h.html#af3b63aaba88eb8d0d16c2eff12db7109',1,'customtimer.h']]]
+  ['toie0',['TOIE0',['../test_8h.html#aeb0694110f1678875ff68e0c7fa406db',1,'test.h']]],
+  ['toie1',['TOIE1',['../test_8h.html#a1c2108f0573584f88d756e12dd3eb334',1,'test.h']]]
 ];
