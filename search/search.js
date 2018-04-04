@@ -7,11 +7,11 @@
 
 var indexSectionsWithContent =
 {
-  0: "_cfmoprstuv",
+  0: "_cfgmoprstuv",
   1: "c",
   2: "ct",
-  3: "cfmprst",
-  4: "_otv",
+  3: "cfgmprst",
+  4: "_ortv",
   5: "tu",
   6: "cfmost"
 };

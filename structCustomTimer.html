@@ -105,12 +105,29 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a09300946b38b86d97fb0b156ef2cc4b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a62c65f1d0a0d390f50345ecd0f9a7271"><td class="memItemLeft" align="right" valign="top"><a class="el" href="test_8h.html#aa93ac051f2256663466253286bfef785">uint16_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCustomTimer.html#a62c65f1d0a0d390f50345ecd0f9a7271">_n_cds</a></td></tr>
 <tr class="separator:a62c65f1d0a0d390f50345ecd0f9a7271"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2076b849b3b9248b44ace7b9748bb83c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="test_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCustomTimer.html#a2076b849b3b9248b44ace7b9748bb83c">_cb_in_interrupt</a> [<a class="el" href="customtimer_8h.html#aa856fcb7aee41aa2cdd570d9472fa2a5">MAX_COUNTDOWNS</a>]</td></tr>
+<tr class="separator:a2076b849b3b9248b44ace7b9748bb83c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a50e4108790b76dc45bdc008ee86dd94c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="customtimer_8h.html#ad3a17d16a861e5cdc4f4af2ed19fa407">T_CALLBACK</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCustomTimer.html#a50e4108790b76dc45bdc008ee86dd94c">_timer_callbacks</a> [<a class="el" href="customtimer_8h.html#aa856fcb7aee41aa2cdd570d9472fa2a5">MAX_COUNTDOWNS</a>]</td></tr>
 <tr class="separator:a50e4108790b76dc45bdc008ee86dd94c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9bd21ee019d7ac41967bc27138aff8e0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="customtimer_8h.html#ad3a17d16a861e5cdc4f4af2ed19fa407">T_CALLBACK</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structCustomTimer.html#a9bd21ee019d7ac41967bc27138aff8e0">ready_callback</a></td></tr>
+<tr class="separator:a9bd21ee019d7ac41967bc27138aff8e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Structure holding all necessary information for the custom countdowns. The maximum number of available countdowns is defined by <a class="el" href="customtimer_8h.html#aa856fcb7aee41aa2cdd570d9472fa2a5">MAX_COUNTDOWNS</a>, which defaults to 10. </p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
+<a class="anchor" id="a2076b849b3b9248b44ace7b9748bb83c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="test_8h.html#aba7bc1797add20fe3efdf37ced1182c5">uint8_t</a> CustomTimer::_cb_in_interrupt[<a class="el" href="customtimer_8h.html#aa856fcb7aee41aa2cdd570d9472fa2a5">MAX_COUNTDOWNS</a>]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Flags whether, a callback of countdown[x] should be run inside the ISR </p>
+
+</div>
+</div>
 <a class="anchor" id="aaedf2c0761d3a5c5f0fc620b8ff3066b"></a>
 <div class="memitem">
 <div class="memproto">
@@ -199,6 +216,19 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Array containing the desired callbacks for each countdown. </p>
+
+</div>
+</div>
+<a class="anchor" id="a9bd21ee019d7ac41967bc27138aff8e0"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="customtimer_8h.html#ad3a17d16a861e5cdc4f4af2ed19fa407">T_CALLBACK</a> CustomTimer::ready_callback</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Latest available non-ISR callback </p>
 
 </div>
 </div>
