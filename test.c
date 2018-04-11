@@ -38,6 +38,8 @@ char compare_cb(T_CALLBACK yielded, T_CALLBACK expected, const char* hint);
 
 /* mock AVR interrupt enabling */
 void sei(){};
+/* mock AVR interrupt disabling */
+void cli(){};
 
 /*
  * Test functions

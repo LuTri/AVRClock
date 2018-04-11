@@ -34,3 +34,4 @@ extern uint16_t TCNT1;
 extern uint16_t OCR1A;
 
 void sei();
+void cli();
