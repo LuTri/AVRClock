@@ -1,7 +1,7 @@
 var searchData=
 [
   ['sei',['sei',['../test_8c.html#a05eedbdaac4cff5e38ced1c9706eec54',1,'sei():&#160;test.c'],['../test_8h.html#a05eedbdaac4cff5e38ced1c9706eec54',1,'sei():&#160;test.c']]],
-  ['set_5fovfs_5fand_5fticks',['set_ovfs_and_ticks',['../customtimer_8c.html#acdb18153473a1f7725aded7d4c07f8d9',1,'customtimer.c']]],
+  ['set_5fovfs_5fand_5fticks',['set_ovfs_and_ticks',['../customtimer_8c.html#ab10121fd619404d5c09013b356ed6333',1,'customtimer.c']]],
   ['set_5fvalue_5fto_5f1',['set_value_to_1',['../test_8c.html#a898fec3e6c30586e2d3da47484426fb3',1,'test.c']]],
   ['set_5fvalue_5fto_5f2',['set_value_to_2',['../test_8c.html#a8bd0a797fe0ca794bbf636becd740378',1,'test.c']]],
   ['set_5fvalue_5fto_5f3',['set_value_to_3',['../test_8c.html#ab7e18b7fb82c8b8916fa17ca200b2b43',1,'test.c']]],
