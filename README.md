@@ -69,11 +69,7 @@ submodules:
 	$(MAKE) -C $(CLOCK_SUBMODULE)
 ```
 
-and add this target to your main building-process:
-
-```
-build: subsystems elf hex ...
-```
+Call the target `submodules` wherever it's needed.
 
 ### Format the code
 
