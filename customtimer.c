@@ -200,8 +200,10 @@ void callback_and_next(void) {
 
 T_CALLBACK get_current_callback(void) {
     T_CALLBACK cb;
+    cli();
     cb = _CT_O.ready_callback;
     _CT_O.ready_callback = NULL;
+    sei();
 
     return cb;
 }
