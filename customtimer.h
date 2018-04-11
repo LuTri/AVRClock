@@ -19,28 +19,11 @@
 #ifndef _CUSTOMTIMER_H
 #define _CUSTOMTIMER_H
 
-#ifndef TESTING
-#include <avr/io.h>
-#else
-#include "test.h"
-void TIMER1_COMPA_vect(void);
-void TIMER1_OVF_vect(void);
-#endif
+#include "timer.h"
 
 #ifndef MAX_COUNTDOWNS
 #define MAX_COUNTDOWNS 10
 #endif
-
-#define MAX_TCNT 0xFFFF
-
-/*! @brief Seconds passing between 2 ticks, with a prescaler of 1024. */
-#define SECONDS_PER_TICK (1024.0f / F_CPU)
-/*! @brief Seconds passing between 2 overflows, with a prescaler set to 1024. */
-#define SECONDS_PER_OVERFLOW (SECONDS_PER_TICK * MAX_TCNT)
-
-/*! @brief Maximum seconds a timer can count with a prescaler set to 1024. */
-#define MAX_SECONDS \
-    (0xFFFE * SECONDS_PER_OVERFLOW) + (0xFFFE * SECONDS_PER_TICK)
 
 /*!
  * Callback-function pointer typedef. All Callbacks must not have any arguments.

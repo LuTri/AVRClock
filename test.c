@@ -23,11 +23,11 @@
 
 typedef char (*TEST_FUNC)(void);
 
-uint16_t TCCR1A = 0;
-uint16_t TCCR1B = 0;
-uint16_t TIMSK1 = 0;
-uint16_t TCNT1 = 0;
-uint16_t OCR1A = 0;
+uint16_t T_CONTROL_A = 0;
+uint16_t T_CONTROL_B = 0;
+uint16_t T_INTERRUPT_MASK = 0;
+uint16_t T_COUNTER_REGISTER = 0;
+uint16_t T_COMPARE_REGISTER = 0;
 
 void print_test_beauty(const char* name);
 void success_message(const char* name);
@@ -72,13 +72,22 @@ char test_failure_on_exceeding(void) {
 /* preparation testing */
 
 char test_countdown_preparation(void) {
+    int i;
     char buf[1000];
     char result = 0;
 
-    float seconds[] = {1.3, 7.1, MAX_SECONDS - 1, 0};
+    float seconds[4];
+    int expected[4][2];
+
     float fail_zeros[11] = {0};
 
-    int expected[][2] = {{0, 15625}, {1, 31250}, {65534, 46875}, {0, 0}};
+    for (i = 0; i < 4; i++) {
+        seconds[i] = (MAX_SECONDS - 1) / 3 * i;
+        expected[i][0] = (int)(seconds[i] / SECONDS_PER_OVERFLOW);
+        expected[i][1] =
+            (int)(seconds[i] - (expected[i][0] * SECONDS_PER_OVERFLOW)) /
+            SECONDS_PER_TICK;
+    }
 
     T_CALLBACK cb[] = {sei, sei};
     T_CALLBACK cb_zeros[11] = {NULL};
@@ -97,7 +106,7 @@ char test_countdown_preparation(void) {
         return 1;
     }
 
-    for (int i = 0; i < 4; i++) {
+    for (i = 0; i < 4; i++) {
         sprintf(buf, "Overflow calc for %f", seconds[i]);
         result |= compare_dec(_CT_O._cd_ovfs[i], expected[i][0], buf);
         sprintf(buf, "Tick calc for %f", seconds[i]);
@@ -135,9 +144,9 @@ char test_countdown_callback(void) {
     }
     run_countdown();
     result |= compare_dec(value, 0, "PRE Callback execution");
-    TIMER1_COMPA_vect();
+    CONCAT_EXP(TIMER, _COMPA_vect)();
     result |= compare_dec(value, 1, "Callback execution 1");
-    TIMER1_COMPA_vect();
+    CONCAT_EXP(TIMER, _COMPA_vect)();
     result |= compare_dec(value, 2, "Callback execution 2");
 
     if (result != 0) {
@@ -167,10 +176,10 @@ char test_reset_countdowns(void) {
     }
     run_countdown();
     result |= compare_dec(value, 0, "PRE Callback execution");
-    TIMER1_COMPA_vect();
+    CONCAT_EXP(TIMER, _COMPA_vect)();
     result |= compare_dec(value, 1, "Callback execution 1");
     reset_all_countdowns();
-    TIMER1_COMPA_vect();
+    CONCAT_EXP(TIMER, _COMPA_vect)();
     result |= compare_dec(value, 1, "Callback execution 2");
 
     if (result != 0) {
@@ -204,11 +213,11 @@ char test_non_isr_callback_combination(void) {
     run_countdown();
 
     result |= compare_dec(value, 0, "PRE Callback execution");
-    TIMER1_COMPA_vect();
+    CONCAT_EXP(TIMER, _COMPA_vect)();
     compare_cb(get_current_callback(), NULL, "Available callback 1");
     result |= compare_dec(value, 1, "Callback execution 1");
 
-    TIMER1_COMPA_vect();
+    CONCAT_EXP(TIMER, _COMPA_vect)();
     result |= compare_dec(value, 1, "Callback execution 2");
 
     cur_cb = get_current_callback();
@@ -216,7 +225,7 @@ char test_non_isr_callback_combination(void) {
     (*cur_cb)();
     result |= compare_dec(value, 2, "NON-ISR Callback execution 2");
 
-    TIMER1_COMPA_vect();
+    CONCAT_EXP(TIMER, _COMPA_vect)();
     compare_cb(get_current_callback(), NULL, "Available callback 3");
     result |= compare_dec(value, 3, "Callback execution 3");
 
@@ -277,7 +286,7 @@ char compare_cb(T_CALLBACK yielded, T_CALLBACK expected, const char* hint) {
 /* returns the number of failed tests */
 int main(void) {
     int idx = 0;
-    char success = 0;
+    int success = 0;
 
     TEST_FUNC* funcs;
     TEST_FUNC func;
@@ -286,6 +295,12 @@ int main(void) {
 
     while ((func = funcs[idx++]) != NULL) {
         success += (*func)();
+    }
+
+    if (success == 0) {
+        printf("Awesome, all tests succeeded!\n");
+    } else {
+        printf("%d tests failed.\n", success);
     }
 
     return success;

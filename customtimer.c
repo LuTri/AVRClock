@@ -84,14 +84,14 @@ uint8_t prepare_countdowns(uint16_t n_cds, float* seconds,
     }
 }
 
-/*! @brief Set the prescaler of TCCR1 to 1024.
+/*! @brief Set the prescaler of TIMER to PRESCALER.
  *
  * This will also cause the hardware-timer to start running. */
-inline void prescale_1024(void) { TCCR1B = (1 << CS12) | (1 << CS10); }
+inline void prescale_timer(void) { T_CONTROL_B = PRESCALE_BITS; }
 
 inline void stop_timer(void) {
-    TIMSK1 = 0;
-    TCCR1B = 0;
+    T_INTERRUPT_MASK = 0;
+    T_CONTROL_B = 0;
 }
 
 uint8_t prepare_single_countdown(float seconds, T_CALLBACK callback,
@@ -106,27 +106,27 @@ uint8_t prepare_single_countdown(float seconds, T_CALLBACK callback,
 /*! @brief Start the timer, triggering interrupts on overflows. */
 void start_overflow_timer(void) {
     _CT_O._cur_passed_overflows = 0;
-    TCCR1A = 0;
-    TCNT1 = 0;
+    T_CONTROL_A = 0;
+    T_COUNTER_REGISTER = 0;
 
     // Enable timer-overflow interrupts.
-    TIMSK1 = (1 << TOIE1);
+    T_INTERRUPT_MASK = (1 << T_OVF_I_BIT);
 
-    prescale_1024();
+    prescale_timer();
 }
 
 /*! @brief Start the timer, triggering compare interrupts. */
 void start_compare_timer(void) {
-    TCNT1 = 0;
-    TCCR1A = 0;
+    T_COUNTER_REGISTER = 0;
+    T_CONTROL_A = 0;
 
     // Set the ticks to run to before interrupting.
-    OCR1A = _CT_O._cd_ticks[_CT_O._cur_cd];
+    T_COMPARE_REGISTER = _CT_O._cd_ticks[_CT_O._cur_cd];
 
     // Enable timer-compare-interrupts.
-    TIMSK1 = (1 << OCIE1A);
+    T_INTERRUPT_MASK = (1 << T_CMP_I_BIT);
 
-    prescale_1024();
+    prescale_timer();
 }
 
 /*! @brief Execute a timer, running the countdown at _CT_O._cur_cd */
@@ -223,18 +223,18 @@ uint8_t check_and_inc_steps(void) {
 }
 
 #ifndef TESTING
-ISR(TIMER1_COMPA_vect)
+ISR(CONCAT_EXP(TIMER, _COMPA_vect))
 #else
-void TIMER1_COMPA_vect(void)
+void CONCAT_EXP(TIMER, _COMPA_vect)(void)
 #endif
 {
     callback_and_next();
 }
 
 #ifndef TESTING
-ISR(TIMER1_OVF_vect)
+ISR(CONCAT_EXP(TIMER, _OVF_vect))
 #else
-void TIMER1_OVF_vect(void)
+void CONCAT_EXP(TIMER, _OVF_vect)(void)
 #endif
 {
     if (check_and_inc_steps()) {

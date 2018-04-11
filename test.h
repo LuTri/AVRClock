@@ -21,17 +21,38 @@ typedef unsigned char uint8_t;
 
 #define F_CPU 16000000
 
-#define CS10 0b1
-#define CS12 0b11
-#define TOIE0 0b1
-#define TOIE1 0b10
-#define OCIE1A 0b1
+/* Mock bit definitions */
+#define CS00 0b1
+#define CS01 0b10
+#define CS02 0b100
 
-extern uint16_t TCCR1A;
-extern uint16_t TCCR1B;
-extern uint16_t TIMSK1;
-extern uint16_t TCNT1;
-extern uint16_t OCR1A;
+#define CS10 0b1
+#define CS11 0b10
+#define CS12 0b100
+
+#define CS20 0b1
+#define CS21 0b10
+#define CS22 0b100
+
+#define CS30 0b1
+#define CS31 0b10
+#define CS32 0b100
+
+#define TOIE0 0b1
+#define TOIE1 0b1
+#define TOIE2 0b1
+#define TOIE3 0b1
+
+#define OCIE0A 0b10
+#define OCIE1A 0b10
+#define OCIE2A 0b10
+#define OCIE3A 0b10
+
+extern uint16_t T_CONTROL_A;
+extern uint16_t T_CONTROL_B;
+extern uint16_t T_INTERRUPT_MASK;
+extern uint16_t T_COUNTER_REGISTER;
+extern uint16_t T_COMPARE_REGISTER;
 
 void sei();
 void cli();

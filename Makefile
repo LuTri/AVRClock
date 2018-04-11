@@ -14,12 +14,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# MCU name
-MCU = atmega328p
+# Inherit parameters from a parent's Makefile
+ifndef MCU # default target MCU to atmega328p
+	MCU = atmega328p
+endif
 
-# Main Oscillator Frequency
-# This is only used to define F_OSC in all assembler and c-sources.
-F_OSC = 16000000
+ifndef F_OSC # default quartz speed to 16MHz
+	F_OSC = 16000000
+endif
+
+ifndef TIMERNR # default timer number to 1
+	TIMERNR=1
+endif
+
+ifndef PRESCALER # default prescaler to 1024
+	PRESCALER=1024
+endif
+
+ifndef TIMERBITS # default bitsize of used timer to 16
+	TIMERBITS=16
+endif
 
 # Output format. (can be srec, ihex, binary)
 FORMAT = ihex
@@ -49,6 +63,11 @@ DEBUG = dwarf-2
 # gnu99 - c99 plus GCC extensions
 CSTANDARD = -std=gnu99
 
+
+TIMERFLAGS = -DTIMERNR=$(TIMERNR)
+TIMERFLAGS += -DPRESCALER=$(PRESCALER)
+TIMERFLAGS += -DTIMERBITS=$(TIMERBITS)
+
 # Compiler flags.
 #  -g*:          generate debugging information
 #  -O*:          optimization level
@@ -65,10 +84,12 @@ CFLAGS += $(CSTANDARD)
 CFLAGS += -DF_OSC=$(F_OSC)
 CFLAGS += -DF_CPU=$(F_OSC)
 CFLAGS += -DMAX_COUNTDOWNS=10
+CFLAGS += $(TIMERFLAGS)
 
 TFLAGS = -Wall
 TFLAGS += -std=c99
 TFLAGS += -DTESTING
+TFLAGS += $(TIMERFLAGS)
 
 # Define programs and commands.
 CC = avr-gcc
