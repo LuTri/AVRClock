@@ -39,17 +39,22 @@ CustomTimer _CT_O = {._cd_ticks = {0},
 /*! @brief Calculate necessary overflows and timer-ticks.
  *
  * Calculate the necessary overlows and timer-ticks for a desired time. */
-void set_ovfs_and_ticks(
+uint8_t set_ovfs_and_ticks(
     float seconds /*! Desired time in seconds. */,
     uint16_t* t_ovf /*! Variable to be set to necessary overflows */,
     uint16_t* t_ticks /*! Variable to be set to necessary ticks*/) {
     uint16_t ovfs, ticks;
+    if (seconds > MAX_SECONDS) {
+        return 0;
+    }
     ovfs = (uint16_t)(seconds / SECONDS_PER_OVERFLOW);
     ticks =
         (uint16_t)(seconds - (ovfs * SECONDS_PER_OVERFLOW)) / SECONDS_PER_TICK;
 
     *t_ticks = ticks;
     *t_ovf = ovfs;
+
+    return 1;
 }
 
 uint8_t prepare_countdowns(uint16_t n_cds, float* seconds,
@@ -64,8 +69,10 @@ uint8_t prepare_countdowns(uint16_t n_cds, float* seconds,
         for (idx = 0; idx < n_cds; idx++) {
             _CT_O._timer_callbacks[idx] = callbacks[idx];
 
-            set_ovfs_and_ticks(seconds[idx], &(_CT_O._cd_ovfs[idx]),
-                               &(_CT_O._cd_ticks[idx]));
+            if (!set_ovfs_and_ticks(seconds[idx], &(_CT_O._cd_ovfs[idx]),
+                                    &(_CT_O._cd_ticks[idx]))) {
+                return 0;
+            }
             if (cb_in_interrupt == NULL) {
                 _CT_O._cb_in_interrupt[idx] = 1;
             } else {

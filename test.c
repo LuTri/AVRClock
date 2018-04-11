@@ -45,6 +45,30 @@ void cli(){};
  * Test functions
  */
 
+/* time exceeding testing */
+
+char test_failure_on_exceeding(void) {
+    char result = 0;
+    float seconds = MAX_SECONDS + 1;
+
+    print_test_beauty(__FUNCTION__);
+
+    if ((prepare_single_countdown(seconds, sei, 0))) {
+        printf(
+            "Countdown preparation did not abort while exceeding "
+            "MAX_SECONDS!\n");
+        failure_message(__FUNCTION__);
+        return 1;
+    }
+
+    if (result != 0) {
+        failure_message(__FUNCTION__);
+    } else {
+        success_message(__FUNCTION__);
+    }
+    return result;
+}
+
 /* preparation testing */
 
 char test_countdown_preparation(void) {
@@ -211,9 +235,9 @@ char test_non_isr_callback_combination(void) {
 /* Generate the list of testfunction, add function-names here */
 TEST_FUNC* collect_tests(void) {
     static TEST_FUNC funcs[] = {
-        test_countdown_preparation, test_countdown_callback,
-        test_reset_countdowns, test_non_isr_callback_combination,
-        NULL /* Array end */
+        test_failure_on_exceeding,         test_countdown_preparation,
+        test_countdown_callback,           test_reset_countdowns,
+        test_non_isr_callback_combination, NULL /* Array end */
     };
     return funcs;
 }
