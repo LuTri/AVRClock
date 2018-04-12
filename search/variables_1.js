@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['ocr1a',['OCR1A',['../test_8c.html#aae6e2373c57a504ad0abef67de4db873',1,'OCR1A():&#160;test.c'],['../test_8h.html#aae6e2373c57a504ad0abef67de4db873',1,'OCR1A():&#160;test.c']]]
+  ['ready_5fcallback',['ready_callback',['../structCustomTimer.html#a9bd21ee019d7ac41967bc27138aff8e0',1,'CustomTimer']]]
 ];

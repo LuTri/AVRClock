@@ -1,5 +1,7 @@
 var searchData=
 [
+  ['ocie0a',['OCIE0A',['../test_8h.html#ac325db3b29e23d531e8a07a6ec48aa1e',1,'test.h']]],
   ['ocie1a',['OCIE1A',['../test_8h.html#aaabe2b1f537a58a532bd8d61a21f597c',1,'test.h']]],
-  ['ocr1a',['OCR1A',['../test_8c.html#aae6e2373c57a504ad0abef67de4db873',1,'OCR1A():&#160;test.c'],['../test_8h.html#aae6e2373c57a504ad0abef67de4db873',1,'OCR1A():&#160;test.c']]]
+  ['ocie2a',['OCIE2A',['../test_8h.html#a007fa1c17dd79438de6f3e1fb2464778',1,'test.h']]],
+  ['ocie3a',['OCIE3A',['../test_8h.html#a95d61ba3a664ebed3539784aa39c474f',1,'test.h']]]
 ];

@@ -89,7 +89,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">customtimer.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;avr/io.h&gt;</code><br/>
+<div class="textblock"><code>#include &quot;<a class="el" href="timer_8h_source.html">timer.h</a>&quot;</code><br/>
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for customtimer.h:</div>
 <div class="dyncontent">
@@ -116,17 +116,6 @@ Classes</h2></td></tr>
 Macros</h2></td></tr>
 <tr class="memitem:aa856fcb7aee41aa2cdd570d9472fa2a5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="customtimer_8h.html#aa856fcb7aee41aa2cdd570d9472fa2a5">MAX_COUNTDOWNS</a>&#160;&#160;&#160;10</td></tr>
 <tr class="separator:aa856fcb7aee41aa2cdd570d9472fa2a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a19fda32821a04f7f14f29aac70641260"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="customtimer_8h.html#a19fda32821a04f7f14f29aac70641260">MAX_TCNT</a>&#160;&#160;&#160;0xFFFF</td></tr>
-<tr class="separator:a19fda32821a04f7f14f29aac70641260"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af3b63aaba88eb8d0d16c2eff12db7109"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="customtimer_8h.html#af3b63aaba88eb8d0d16c2eff12db7109">SECONDS_PER_TICK</a>&#160;&#160;&#160;(1024.0f / F_CPU)</td></tr>
-<tr class="memdesc:af3b63aaba88eb8d0d16c2eff12db7109"><td class="mdescLeft">&#160;</td><td class="mdescRight">Seconds passing between 2 ticks, with a prescaler of 1024.  <a href="#af3b63aaba88eb8d0d16c2eff12db7109">More...</a><br/></td></tr>
-<tr class="separator:af3b63aaba88eb8d0d16c2eff12db7109"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3af3f37e52689dd5043feca09823ab69"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="customtimer_8h.html#a3af3f37e52689dd5043feca09823ab69">SECONDS_PER_OVERFLOW</a>&#160;&#160;&#160;(<a class="el" href="customtimer_8h.html#af3b63aaba88eb8d0d16c2eff12db7109">SECONDS_PER_TICK</a> * <a class="el" href="customtimer_8h.html#a19fda32821a04f7f14f29aac70641260">MAX_TCNT</a>)</td></tr>
-<tr class="memdesc:a3af3f37e52689dd5043feca09823ab69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Seconds passing between 2 overflows, with a prescaler set to 1024.  <a href="#a3af3f37e52689dd5043feca09823ab69">More...</a><br/></td></tr>
-<tr class="separator:a3af3f37e52689dd5043feca09823ab69"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad573bc67e6c14677a06d1737f3d72975"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="customtimer_8h.html#ad573bc67e6c14677a06d1737f3d72975">MAX_SECONDS</a>&#160;&#160;&#160;(0xFFFE * SECONDS_PER_OVERFLOW) + (0xFFFE * SECONDS_PER_TICK)</td></tr>
-<tr class="memdesc:ad573bc67e6c14677a06d1737f3d72975"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum seconds a timer can count with a prescaler set to 1024.  <a href="#ad573bc67e6c14677a06d1737f3d72975">More...</a><br/></td></tr>
-<tr class="separator:ad573bc67e6c14677a06d1737f3d72975"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -161,60 +150,6 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ad573bc67e6c14677a06d1737f3d72975"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MAX_SECONDS&#160;&#160;&#160;(0xFFFE * SECONDS_PER_OVERFLOW) + (0xFFFE * SECONDS_PER_TICK)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Maximum seconds a timer can count with a prescaler set to 1024. </p>
-
-</div>
-</div>
-<a class="anchor" id="a19fda32821a04f7f14f29aac70641260"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MAX_TCNT&#160;&#160;&#160;0xFFFF</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a3af3f37e52689dd5043feca09823ab69"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SECONDS_PER_OVERFLOW&#160;&#160;&#160;(<a class="el" href="customtimer_8h.html#af3b63aaba88eb8d0d16c2eff12db7109">SECONDS_PER_TICK</a> * <a class="el" href="customtimer_8h.html#a19fda32821a04f7f14f29aac70641260">MAX_TCNT</a>)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Seconds passing between 2 overflows, with a prescaler set to 1024. </p>
-
-</div>
-</div>
-<a class="anchor" id="af3b63aaba88eb8d0d16c2eff12db7109"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SECONDS_PER_TICK&#160;&#160;&#160;(1024.0f / F_CPU)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Seconds passing between 2 ticks, with a prescaler of 1024. </p>
 
 </div>
 </div>
