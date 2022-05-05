@@ -97,6 +97,9 @@ uint8_t prepare_single_countdown(
  * countdown is already running */
 uint8_t run_countdown(void);
 
+/*! @brief Start the timer, triggering compare interrupts if desired. */
+void start_compare_timer(uint8_t interrupting);
+
 /*! @brief Stop and reset all configured countdowns.*/
 void reset_all_countdowns(void);
 

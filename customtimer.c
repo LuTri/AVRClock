@@ -115,16 +115,17 @@ void start_overflow_timer(void) {
     prescale_timer();
 }
 
-/*! @brief Start the timer, triggering compare interrupts. */
-void start_compare_timer(void) {
+/*! @brief Start the timer, triggering compare interrupts if desired. */
+void start_compare_timer(uint8_t interrupting) {
     T_COUNTER_REGISTER = 0;
     T_CONTROL_A = 0;
 
     // Set the ticks to run to before interrupting.
     T_COMPARE_REGISTER = _CT_O._cd_ticks[_CT_O._cur_cd];
 
-    // Enable timer-compare-interrupts.
-    T_INTERRUPT_MASK = (1 << T_CMP_I_BIT);
+    if (interrupting)
+        // Enable timer-compare-interrupts.
+        T_INTERRUPT_MASK = (1 << T_CMP_I_BIT);
 
     prescale_timer();
 }
@@ -134,7 +135,7 @@ void start_timer(void) {
     if (_CT_O._cd_ovfs[_CT_O._cur_cd] > 0) {
         start_overflow_timer();
     } else {
-        start_compare_timer();
+        start_compare_timer(1);
     }
 }
 
@@ -238,6 +239,6 @@ void CONCAT_EXP(TIMER, _OVF_vect)(void)
 #endif
 {
     if (check_and_inc_steps()) {
-        start_compare_timer();
+        start_compare_timer(1);
     }
 }
