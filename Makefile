@@ -35,6 +35,10 @@ ifndef TIMERBITS # default bitsize of used timer to 16
 	TIMERBITS=16
 endif
 
+ifndef MAX_COUNTDOWNS # default max countdowns usable to 3
+	MAX_COUNTDOWNS=3
+endif
+
 # Output format. (can be srec, ihex, binary)
 FORMAT = ihex
 
@@ -83,7 +87,7 @@ CFLAGS += -Wa,-adhlns=$(<:.c=.lst)
 CFLAGS += $(CSTANDARD)
 CFLAGS += -DF_OSC=$(F_OSC)
 CFLAGS += -DF_CPU=$(F_OSC)
-CFLAGS += -DMAX_COUNTDOWNS=10
+CFLAGS += -DMAX_COUNTDOWNS=$(MAX_COUNTDOWNS)
 CFLAGS += $(TIMERFLAGS)
 
 TFLAGS = -Wall
