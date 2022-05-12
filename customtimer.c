@@ -104,13 +104,14 @@ uint8_t prepare_single_countdown(float seconds, T_CALLBACK callback,
 }
 
 /*! @brief Start the timer, triggering interrupts on overflows. */
-void start_overflow_timer(void) {
+void start_overflow_timer(uint8_t interrupting) {
     _CT_O._cur_passed_overflows = 0;
     T_CONTROL_A = 0;
     T_COUNTER_REGISTER = 0;
 
-    // Enable timer-overflow interrupts.
-    T_INTERRUPT_MASK = (1 << T_OVF_I_BIT);
+    if (interrupting)
+        // Enable timer-overflow interrupts.
+        T_INTERRUPT_MASK = (1 << T_OVF_I_BIT);
 
     prescale_timer();
 }
@@ -133,7 +134,7 @@ void start_compare_timer(uint8_t interrupting) {
 /*! @brief Execute a timer, running the countdown at _CT_O._cur_cd */
 void start_timer(void) {
     if (_CT_O._cd_ovfs[_CT_O._cur_cd] > 0) {
-        start_overflow_timer();
+        start_overflow_timer(1);
     } else {
         start_compare_timer(1);
     }
