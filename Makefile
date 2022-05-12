@@ -31,10 +31,6 @@ ifndef PRESCALER # default prescaler to 1024
 	PRESCALER=1024
 endif
 
-ifndef TIMERBITS # default bitsize of used timer to 16
-	TIMERBITS=16
-endif
-
 ifndef MAX_COUNTDOWNS # default max countdowns usable to 3
 	MAX_COUNTDOWNS=3
 endif
@@ -70,7 +66,6 @@ CSTANDARD = -std=gnu99
 
 TIMERFLAGS = -DTIMERNR=$(TIMERNR)
 TIMERFLAGS += -DPRESCALER=$(PRESCALER)
-TIMERFLAGS += -DTIMERBITS=$(TIMERBITS)
 
 # Compiler flags.
 #  -g*:          generate debugging information

@@ -38,12 +38,69 @@
 #define T_CMP_I_BIT CONCAT_EXP(CONCAT_EXP(OCIE, TIMERNR), A)
 
 /* Define thresholds for defined timer */
-#if TIMERBITS == 16
+#if (TIMERNR == 0)
+#ifdef TCNT0H
+#define TIMERBITS 16
 #define MAX_TCNT 0xFFFF
-#elif TIMERBITS == 8
-#define MAX_TCNT 0xFF
 #else
-#error TIMERBITS can only by 8 or 16
+#define TIMERBITS 8
+#define MAX_TCNT 0xFF
+#endif
+#endif
+
+/* Define thresholds for defined timer */
+#if (TIMERNR == 1)
+#ifdef TCNT1H
+#define TIMERBITS 16
+#define MAX_TCNT 0xFFFF
+#else
+#define TIMERBITS 8
+#define MAX_TCNT 0xFF
+#endif
+#endif
+
+/* Define thresholds for defined timer */
+#if (TIMERNR == 2)
+#ifdef TCNT2H
+#define TIMERBITS 16
+#define MAX_TCNT 0xFFFF
+#else
+#define TIMERBITS 8
+#define MAX_TCNT 0xFF
+#endif
+#endif
+
+/* Define thresholds for defined timer */
+#if (TIMERNR == 3)
+#ifdef TCNT3H
+#define TIMERBITS 16
+#define MAX_TCNT 0xFFFF
+#else
+#define TIMERBITS 8
+#define MAX_TCNT 0xFF
+#endif
+#endif
+
+/* Define thresholds for defined timer */
+#if (TIMERNR == 4)
+#ifdef TCNT4H
+#define TIMERBITS 16
+#define MAX_TCNT 0xFFFF
+#else
+#define TIMERBITS 8
+#define MAX_TCNT 0xFF
+#endif
+#endif
+
+/* Define thresholds for defined timer */
+#if (TIMERNR == 5)
+#ifdef TCNT5H
+#define TIMERBITS 16
+#define MAX_TCNT 0xFFFF
+#else
+#define TIMERBITS 8
+#define MAX_TCNT 0xFF
+#endif
 #endif
 
 /* Define bits for defined timer and prescaler */
