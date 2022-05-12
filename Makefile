@@ -43,7 +43,11 @@ TARGET = customtimer
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(TARGET).c
+SRC := $(shell find ./ -not -path '*test*' -name '*.c')
+TSRC := test.c $(SRC)
+
+OBJ := $(SRC:.c=.o)
+TOBJ := $(TSRC:.c=.o)
 
 # Optimization level, can be [0, 1, 2, 3, s].
 # 0 = turn off optimization. s = optimize for size.
@@ -99,15 +103,11 @@ REMOVE = rm -f
 # English
 MSG_ERRORS_NONE = Errors: none
 MSG_BEGIN = -------- begin --------
+MSG_SOURCES = Sources:
+MSG_OBJECTS = Objects:
 MSG_END = --------  end  --------
 MSG_COMPILING = Compiling:
 MSG_CLEANING = Cleaning project:
-
-
-
-
-# Define all object files.
-OBJ = $(SRC:.c=.o)
 
 # Compiler flags to generate dependency files.
 ### GENDEPFLAGS = -Wp,-M,-MP,-MT,$(*F).o,-MF,.dep/$(@F).d
@@ -118,20 +118,32 @@ GENDEPFLAGS = -MD -MP -MF .dep/$(@F).d
 ALL_CFLAGS = -mmcu=$(MCU) -I. $(CFLAGS) $(GENDEPFLAGS)
 
 # Default target.
-all: begin clean gccversion build size finished end
+all: begin clean_list gccversion build size finished end
 
-build: object
+# Target: run tests
+test: TARGET=test
+test: SRC=$(TSRC)
+test: CC=gcc
+test: ALL_CFLAGS=$(TFLAGS)
+test: begin clean gccversion tbuild link run_test end
+
+run_test:
+	./test
+
+build: $(OBJ)
+tbuild : $(TOBJ)
+
+# Define all object files.
+OBJ = $(SRC:.c=.o)
 
 size:
-	$(SIZE) $(TARGET).o
-
-object: $(TARGET).o
-
-tobject: customtimer.o test.o
+	$(SIZE) $(OBJ)
 
 begin:
 	@echo
 	@echo $(MSG_BEGIN)
+	@echo $(MSG_SOURCES) $(SRC)
+	@echo $(MSG_OBJECTS) $(OBJ)
 
 finished:
 	@echo $(MSG_ERRORS_NONE)
@@ -155,16 +167,6 @@ link:
 
 # Target: clean project.
 clean: begin clean_list finished end
-
-run_test:
-	./test
-
-# Target: run tests
-test: TARGET=test
-test: SRC=$(TARGET).c customtimer.c
-test: CC=gcc
-test: ALL_CFLAGS=$(TFLAGS)
-test: begin clean gccversion tobject link run_test end
 
 clean_list :
 	@echo
