@@ -113,12 +113,16 @@
 /* prescaling */
 #if PRESCALER == 1024
 #define PRESCALE_BITS (1 << CS_2) | (1 << CS_0)
+
 #elif PRESCALER == 256
-#define PRESCALE_BITS (1 << CS_2) | (1 << CS_1)
+#define PRESCALE_BITS (1 << CS_2)
+
 #elif PRESCALER == 64
 #define PRESCALE_BITS (1 << CS_1) | (1 << CS_0)
+
 #elif PRESCALER == 8
 #define PRESCALE_BITS (1 << CS_1)
+
 #elif PRESCALER == 1
 #define PRESCALE_BITS (1 << CS_0)
 #else
