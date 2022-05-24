@@ -78,6 +78,7 @@ TIMERFLAGS += -DPRESCALER=$(PRESCALER)
 #  -Wall...:     warning level
 #  -Wa,...:      tell GCC to pass this to the assembler.
 #    -adhlns...: create assembler listing
+
 CFLAGS = -g$(DEBUG)
 CFLAGS += -O$(OPT)
 CFLAGS += -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
@@ -88,11 +89,13 @@ CFLAGS += -DF_OSC=$(F_OSC)
 CFLAGS += -DF_CPU=$(F_OSC)
 CFLAGS += -DMAX_COUNTDOWNS=$(MAX_COUNTDOWNS)
 CFLAGS += $(TIMERFLAGS)
+CFLAGS += $(DIAGFLAGS)
 
 TFLAGS = -Wall
 TFLAGS += -std=c99
 TFLAGS += -DTESTING
 TFLAGS += $(TIMERFLAGS)
+TFLAGS += $(DIAGFLAGS)
 
 # Define programs and commands.
 CC = avr-gcc

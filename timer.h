@@ -19,6 +19,10 @@
 #ifndef _TIMER_H
 #define _TIMER_H
 
+#ifndef TESTING
+#include <avr/io.h>
+#endif
+
 #ifndef CONCAT
 #define CONCAT(a, b) a##b
 #endif
@@ -41,10 +45,12 @@
 #if (TIMERNR == 0)
 #ifdef TCNT0H
 #define TIMERBITS 16
-#define MAX_TCNT 0xFFFF
+#define TCNT_MASK 0xFFFF
+#pragma message  ("Configuring 16 bits for timer counter.")
 #else
 #define TIMERBITS 8
-#define MAX_TCNT 0xFF
+#define TCNT_MASK 0xFF
+#pragma message  ("Configuring 8 bits for timer counter.")
 #endif
 #endif
 
@@ -52,10 +58,12 @@
 #if (TIMERNR == 1)
 #ifdef TCNT1H
 #define TIMERBITS 16
-#define MAX_TCNT 0xFFFF
+#define TCNT_MASK 0xFFFF
+#pragma message  ("Configuring 16 bits for timer counter.")
 #else
 #define TIMERBITS 8
-#define MAX_TCNT 0xFF
+#define TCNT_MASK 0xFF
+#pragma message  ("Configuring 8 bits for timer counter.")
 #endif
 #endif
 
@@ -63,10 +71,12 @@
 #if (TIMERNR == 2)
 #ifdef TCNT2H
 #define TIMERBITS 16
-#define MAX_TCNT 0xFFFF
+#define TCNT_MASK 0xFFFF
+#pragma message  ("Configuring 16 bits for timer counter.")
 #else
 #define TIMERBITS 8
-#define MAX_TCNT 0xFF
+#define TCNT_MASK 0xFF
+#pragma message  ("Configuring 8 bits for timer counter.")
 #endif
 #endif
 
@@ -74,10 +84,12 @@
 #if (TIMERNR == 3)
 #ifdef TCNT3H
 #define TIMERBITS 16
-#define MAX_TCNT 0xFFFF
+#define TCNT_MASK 0xFFFF
+#pragma message  ("Configuring 16 bits for timer counter.")
 #else
 #define TIMERBITS 8
-#define MAX_TCNT 0xFF
+#define TCNT_MASK 0xFF
+#pragma message  ("Configuring 8 bits for timer counter.")
 #endif
 #endif
 
@@ -85,10 +97,12 @@
 #if (TIMERNR == 4)
 #ifdef TCNT4H
 #define TIMERBITS 16
-#define MAX_TCNT 0xFFFF
+#define TCNT_MASK 0xFFFF
+#pragma message  ("Configuring 16 bits for timer counter.")
 #else
 #define TIMERBITS 8
-#define MAX_TCNT 0xFF
+#define TCNT_MASK 0xFF
+#pragma message  ("Configuring 8 bits for timer counter.")
 #endif
 #endif
 
@@ -96,10 +110,12 @@
 #if (TIMERNR == 5)
 #ifdef TCNT5H
 #define TIMERBITS 16
-#define MAX_TCNT 0xFFFF
+#define TCNT_MASK 0xFFFF
+#pragma message  ("Configuring 16 bits for timer counter.")
 #else
 #define TIMERBITS 8
-#define MAX_TCNT 0xFF
+#define TCNT_MASK 0xFF
+#pragma message  ("Configuring 8 bits for timer counter.")
 #endif
 #endif
 
@@ -109,6 +125,8 @@
 #define CS_0 CONCAT_EXP(CONCAT_EXP(CS, TIMERNR), 0)
 #define CS_1 CONCAT_EXP(CONCAT_EXP(CS, TIMERNR), 1)
 #define CS_2 CONCAT_EXP(CONCAT_EXP(CS, TIMERNR), 2)
+
+#define TIMER_DATA_TYPE CONCAT_EXP(CONCAT_EXP(uint, TIMERBITS), _t)
 
 /* prescaling */
 #if PRESCALER == 1024
@@ -129,9 +147,7 @@
 #error Unknown PRESCALER value
 #endif
 
-#ifndef TESTING
-#include <avr/io.h>
-#else
+#ifdef TESTING
 #include "test.h"
 void CONCAT_EXP(TIMER, _COMPA_vect)(void);
 void CONCAT_EXP(TIMER, _OVF_vect)(void);
@@ -141,12 +157,16 @@ void CONCAT_EXP(TIMER, _OVF_vect)(void);
 #define SECONDS_PER_TICK (CONCAT_EXP(PRESCALER, .0f) / F_CPU)
 /*! @brief Seconds passing between 2 overflows, with a prescaler set to
  * PRESCALER. */
-#define SECONDS_PER_OVERFLOW (SECONDS_PER_TICK * MAX_TCNT)
+#define SECONDS_PER_OVERFLOW (SECONDS_PER_TICK * TCNT_MASK)
+
+#define TIMER_BENCHMARK_BUFFERS (sizeof(uint64_t) / sizeof(TIMER_DATA_TYPE))
+
+extern TIMER_DATA_TYPE _overflow_counter[TIMER_BENCHMARK_BUFFERS - 1];
 
 /*! @brief Maximum seconds a timer can count with a prescaler set to PRESCALER.
  */
 #define MAX_SECONDS                           \
-    ((MAX_TCNT - 1) * SECONDS_PER_OVERFLOW) + \
-        ((MAX_TCNT - 1) * SECONDS_PER_TICK)
+    ((TCNT_MASK - 1) * SECONDS_PER_OVERFLOW) + \
+        ((TCNT_MASK - 1) * SECONDS_PER_TICK)
 
 #endif

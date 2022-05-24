@@ -23,6 +23,7 @@
 
 typedef char (*TEST_FUNC)(void);
 
+uint8_t SREG = 0;
 uint16_t T_CONTROL_A = 0;
 uint16_t T_CONTROL_B = 0;
 uint16_t T_INTERRUPT_MASK = 0;

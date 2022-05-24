@@ -110,6 +110,8 @@ void reset_all_countdowns(void);
  * @return @c \ref T_CALLBACK of the latest callback or NULL */
 T_CALLBACK get_current_callback(void);
 
+void benchmark(TIMER_DATA_TYPE* overflows, uint16_t* isr_tcnt_target, uint8_t do_end);
+
 #ifdef TESTING
 extern CustomTimer _CT_O;
 #endif

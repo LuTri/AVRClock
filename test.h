@@ -16,7 +16,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-typedef unsigned long uint16_t;
+typedef unsigned long uint64_t;
+typedef unsigned int uint32_t;
+typedef unsigned short uint16_t;
 typedef unsigned char uint8_t;
 
 #define F_CPU 16000000
@@ -53,6 +55,7 @@ extern uint16_t T_CONTROL_B;
 extern uint16_t T_INTERRUPT_MASK;
 extern uint16_t T_COUNTER_REGISTER;
 extern uint16_t T_COMPARE_REGISTER;
+extern uint8_t SREG;
 
 void sei();
 void cli();

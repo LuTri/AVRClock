@@ -112,6 +112,8 @@ void start_overflow_timer(uint8_t interrupting) {
     if (interrupting)
         // Enable timer-overflow interrupts.
         T_INTERRUPT_MASK = (1 << T_OVF_I_BIT);
+    else
+        T_INTERRUPT_MASK &= ~(1 << T_OVF_I_BIT);
 
     prescale_timer();
 }
@@ -127,6 +129,8 @@ void start_compare_timer(uint8_t interrupting) {
     if (interrupting)
         // Enable timer-compare-interrupts.
         T_INTERRUPT_MASK = (1 << T_CMP_I_BIT);
+    else
+        T_INTERRUPT_MASK &= ~(1 << T_CMP_I_BIT);
 
     prescale_timer();
 }
@@ -207,6 +211,53 @@ void callback_and_next(void) {
     }
 }
 
+// FORMAT big endian
+TIMER_DATA_TYPE _overflow_counter[TIMER_BENCHMARK_BUFFERS - 1] = { 0 };
+
+inline void carry_benchmark(const uint8_t idx) {
+    if (!((_overflow_counter[idx]++) ^ TCNT_MASK)
+        && (idx)) carry_benchmark(idx - 1);
+}
+
+volatile uint8_t BENCHMARKING = 0;
+volatile uint16_t ISR_TCNTS = 0;
+
+void _benchmark(TIMER_DATA_TYPE* overflows, uint16_t* isr_tcnt_target,
+               uint8_t do_end) {
+
+    for (uint8_t i = 0; i < TIMER_BENCHMARK_BUFFERS - 2; i++)
+        overflows[i] = 0;
+    overflows[TIMER_BENCHMARK_BUFFERS - 2] = 0x0c;
+    if (!(do_end)) {
+        *isr_tcnt_target = 65535;
+        overflows[TIMER_BENCHMARK_BUFFERS - 1] = 200;
+    } else {
+        *isr_tcnt_target = 16;
+        overflows[TIMER_BENCHMARK_BUFFERS - 1] = 250;
+    }
+}
+
+void benchmark(TIMER_DATA_TYPE* overflows, uint16_t* isr_tcnt_target,
+               uint8_t do_end) {
+    /* When ENDING a benchmark save data first*/
+    if (do_end) {
+        overflows[TIMER_BENCHMARK_BUFFERS - 1] = T_COUNTER_REGISTER;
+        stop_timer();
+        for (uint8_t i = 0; i < TIMER_BENCHMARK_BUFFERS - 1; i++)
+            overflows[i] = _overflow_counter[i];
+        BENCHMARKING = do_end ^ 0xff;
+        *isr_tcnt_target = ISR_TCNTS;
+    } else {
+    /* Start the timer and clear everything BEFORE starting a Benchmark*/
+        *isr_tcnt_target = ISR_TCNTS;
+        BENCHMARKING = do_end ^ 0xff;
+        for (uint8_t i = 0; i < TIMER_BENCHMARK_BUFFERS - 1; i++)
+            overflows[i] = _overflow_counter[i];
+        start_overflow_timer(1);
+        overflows[TIMER_BENCHMARK_BUFFERS - 1] = T_COUNTER_REGISTER;
+    }
+}
+
 T_CALLBACK get_current_callback(void) {
     T_CALLBACK cb;
     cli();
@@ -230,7 +281,9 @@ ISR(CONCAT_EXP(TIMER, _COMPA_vect))
 void CONCAT_EXP(TIMER, _COMPA_vect)(void)
 #endif
 {
+    TIMER_DATA_TYPE _value = T_COUNTER_REGISTER;
     callback_and_next();
+    ISR_TCNTS += T_COUNTER_REGISTER - _value;
 }
 
 #ifndef TESTING
@@ -239,7 +292,11 @@ ISR(CONCAT_EXP(TIMER, _OVF_vect))
 void CONCAT_EXP(TIMER, _OVF_vect)(void)
 #endif
 {
-    if (check_and_inc_steps()) {
+    TIMER_DATA_TYPE _value = T_COUNTER_REGISTER;
+    if (BENCHMARKING) {
+        carry_benchmark(TIMER_BENCHMARK_BUFFERS - 2);
+    } else if (check_and_inc_steps()) {
         start_compare_timer(1);
     }
+    ISR_TCNTS += T_COUNTER_REGISTER - _value;
 }
